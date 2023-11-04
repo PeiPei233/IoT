@@ -11,7 +11,12 @@
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.17.0",
+    "antd": "^5.10.0",
+    "antd-mobile": "^5.33.0",
+    "recharts": "2.9.0",
+    "@arco-design/web-react": "2.55.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

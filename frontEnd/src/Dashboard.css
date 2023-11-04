@@ -1,0 +1,6 @@
+.dashboard .logo {
+    height: 2em;
+    vertical-align: middle;
+    will-change: filter;
+    transition: filter 300ms;
+}
