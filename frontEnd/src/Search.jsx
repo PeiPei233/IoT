@@ -1,100 +1,106 @@
-import { useState } from "react";
-import { Card, Select, Form, Table, DatePicker, Row, Col, Button } from "antd";
+import { useState, useEffect } from "react";
+import { Card, Select, Form, Table, DatePicker, Row, Col, Button, App } from "antd";
 import { SearchOutlined } from '@ant-design/icons';
 import Map from "./Map";
 
 const { RangePicker } = DatePicker;
 
-const options = [
-  {
-    value: 'Device 1',
-    label: 'Device 1'
-  },
-  {
-    value: 'Device 2',
-    label: 'Device 2'
-  },
-  {
-    value: 'Device 3',
-    label: 'Device 3'
-  },
-  {
-    value: 'Device 4',
-    label: 'Device 4'
-  },
-  {
-    value: 'Device 5',
-    label: 'Device 5'
-  },
-  {
-    value: 'Device 6',
-    label: 'Device 6'
-  },
-  {
-    value: 'Device 7',
-    label: 'Device 7'
-  },
-  {
-    value: 'Device 8',
-    label: 'Device 8'
-  },
-  {
-    value: 'Device 9',
-    label: 'Device 9'
-  },
-  {
-    value: 'Device 10',
-    label: 'Device 10'
-  },
-  {
-    value: 'Device 11',
-    label: 'Device 11'
-  },
-  {
-    value: 'Device 12',
-    label: 'Device 12'
-  },
-  {
-    value: 'Device 13',
-    label: 'Device 13'
-  },
-  {
-    value: 'Device 14',
-    label: 'Device 14'
-  },
-  {
-    value: 'Device 15',
-    label: 'Device 15'
-  },
-  {
-    value: 'Device 16',
-    label: 'Device 16'
-  },
-  {
-    value: 'Device 17',
-    label: 'Device 17'
-  },
-  {
-    value: 'Device 18',
-    label: 'Device 18'
-  },
-  {
-    value: 'Device 19',
-    label: 'Device 19'
-  },
-  {
-    value: 'Device 20',
-    label: 'Device 20'
-  },
-  {
-    value: 'Device 21',
-    label: 'Device 21'
-  },
-  {
-    value: 'Device 22',
-    label: 'Device 22'
-  },
-]
+function requestOptionDevices() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        {
+          value: '1234561',
+          label: 'Device 1'
+        },
+        {
+          value: '1234562',
+          label: 'Device 2'
+        },
+        {
+          value: '1234563',
+          label: 'Device 3'
+        },
+        {
+          value: '1234564',
+          label: 'Device 4'
+        },
+        {
+          value: '1234565',
+          label: 'Device 5'
+        },
+        {
+          value: '1234566',
+          label: 'Device 6'
+        },
+        {
+          value: '1234567',
+          label: 'Device 7'
+        },
+        {
+          value: '1234568',
+          label: 'Device 8'
+        },
+        {
+          value: '1234569',
+          label: 'Device 9'
+        },
+        {
+          value: '12345610',
+          label: 'Device 10'
+        },
+        {
+          value: '12345611',
+          label: 'Device 11'
+        },
+        {
+          value: '12345612',
+          label: 'Device 12'
+        },
+        {
+          value: '12345613',
+          label: 'Device 13'
+        },
+        {
+          value: '12345614',
+          label: 'Device 14'
+        },
+        {
+          value: '12345615',
+          label: 'Device 15'
+        },
+        {
+          value: '12345616',
+          label: 'Device 16'
+        },
+        {
+          value: '12345617',
+          label: 'Device 17'
+        },
+        {
+          value: '12345618',
+          label: 'Device 18'
+        },
+        {
+          value: '12345619',
+          label: 'Device 19'
+        },
+        {
+          value: '12345620',
+          label: 'Device 20'
+        },
+        {
+          value: '12345621',
+          label: 'Device 21'
+        },
+        {
+          value: '12345622',
+          label: 'Device 22'
+        },
+      ])
+    }, 1000)
+  })
+}
 
 const columns = [
   {
@@ -129,52 +135,78 @@ const columns = [
   }
 ];
 
-const searchResults = [
-  {
-    deviceID: '10000',
-    deviceName: 'Device 1',
-    deviceType: 'Type 1',
-    deviceStatus: 'Normal',
-    time: '2023/11/12 10:15:30',
-    location: '119.150,123.160'
-  },
-  {
-    deviceID: '10000',
-    deviceName: 'Device 1',
-    deviceType: 'Type 1',
-    deviceStatus: 'Warning',
-    time: '2023/11/12 12:45:00',
-    location: '119.200,123.200'
-  },
-  {
-    deviceID: '10000',
-    deviceName: 'Device 1',
-    deviceType: 'Type 1',
-    deviceStatus: 'Critical',
-    time: '2023/11/12 14:30:15',
-    location: '119.250,123.250'
-  },
-  {
-    deviceID: '10000',
-    deviceName: 'Device 1',
-    deviceType: 'Type 1',
-    deviceStatus: 'Offline',
-    time: '2023/11/12 16:05:45',
-    location: '119.300,123.300'
-  },
-  {
-    deviceID: '10000',
-    deviceName: 'Device 1',
-    deviceType: 'Type 1',
-    deviceStatus: 'Normal',
-    time: '2023/11/12 18:20:30',
-    location: '119.350,123.350'
-  }
-]
+function requestSearchResults() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        {
+          deviceID: '10000',
+          deviceName: 'Device 1',
+          deviceType: 'Type 1',
+          deviceStatus: 'Normal',
+          time: '2023/11/12 10:15:30',
+          location: '119.150,30.160'
+        },
+        {
+          deviceID: '10000',
+          deviceName: 'Device 1',
+          deviceType: 'Type 1',
+          deviceStatus: 'Warning',
+          time: '2023/11/12 12:45:00',
+          location: '119.200,30.200'
+        },
+        {
+          deviceID: '10000',
+          deviceName: 'Device 1',
+          deviceType: 'Type 1',
+          deviceStatus: 'Critical',
+          time: '2023/11/12 14:30:15',
+          location: '119.250,30.250'
+        },
+        {
+          deviceID: '10000',
+          deviceName: 'Device 1',
+          deviceType: 'Type 1',
+          deviceStatus: 'Offline',
+          time: '2023/11/12 16:05:45',
+          location: '119.300,30.300'
+        },
+        {
+          deviceID: '10000',
+          deviceName: 'Device 1',
+          deviceType: 'Type 1',
+          deviceStatus: 'Normal',
+          time: '2023/11/12 18:20:30',
+          location: '119.350,30.350'
+        }
+      ])
+    }, 1000)
+  })
+}
 
 export default function Searching() {
 
   const [form] = Form.useForm()
+  const [options, setOptions] = useState([])
+  const [searchResults, setSearchResults] = useState([])
+  const [searching, setSearching] = useState(false)
+  const [loadingOptions, setLoadingOptions] = useState(false)
+
+  const { message, modal, notification } = App.useApp()
+  
+  useEffect(() => {
+    setLoadingOptions(true)
+    requestOptionDevices().then((res) => {
+      setLoadingOptions(false)
+      setOptions(res)
+      if (res.length === 0) {
+        notification.info({
+          message: 'No devices found',
+          description: 'Please add devices first',
+        });
+      }
+    })
+  }, [])
 
   const onChange = (value) => {
     console.log(`selected ${value}`);
@@ -188,6 +220,11 @@ export default function Searching() {
 
   const onFinish = (values) => {
     console.log('Received values of form: ', values);
+    setSearching(true)
+    requestSearchResults().then((res) => {
+      setSearchResults(res)
+      setSearching(false)
+    })
   }
 
   return (
@@ -205,7 +242,7 @@ export default function Searching() {
             align="middle"
           >
             <Col xs={24} md={11}>
-              <Form.Item label='Device Name'>
+              <Form.Item label='Device Name' name='did'>
                 <Select
                   showSearch
                   width='100%'
@@ -215,11 +252,12 @@ export default function Searching() {
                   onSearch={onSearch}
                   filterOption={filterOption}
                   options={options}
+                  loading={loadingOptions}
                 />
               </Form.Item>
             </Col>
             <Col xs={24} md={11}>
-              <Form.Item label='Time Range'>
+              <Form.Item label='Time Range' name='timeRange'>
                 <RangePicker
                   width='100%'
                 />
@@ -241,15 +279,23 @@ export default function Searching() {
           dataSource={searchResults}
           pagination={false}
           scroll={{ y: 400, x: 550 }}
+          loading={searching}
         />
-        <Map style={{
-          height: 500,
-          width: '100%',
-          borderRadius: 8,
-          overflow: 'hidden',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-          marginTop: 20
-        }} />
+        {searchResults.length !== 0 && <Map
+          style={{
+            height: 500,
+            width: '100%',
+            borderRadius: 8,
+            overflow: 'hidden',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+            marginTop: 20
+          }}
+          path={
+            searchResults.map((item) => {
+              return [+item.location.split(',')[0], +item.location.split(',')[1]]
+            })
+          }
+        />}
       </Card>
     </div>
   )
