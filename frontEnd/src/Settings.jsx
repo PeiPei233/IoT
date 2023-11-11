@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, Form, Button, Input, Row, Col, App, Typography, Modal, Alert } from 'antd';
+import { Menu, Form, Button, Input, Row, Col, App, Typography, Modal, Alert, Avatar } from 'antd';
 import { SettingOutlined, LockOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom'
 
@@ -66,7 +66,7 @@ function Account() {
 
   return (
     <>
-      <Title level={2}
+      <Title level={3}
         style={{
           borderBottom: '1px solid #e8e8e8',
           paddingBottom: '0.5rem',
@@ -81,6 +81,9 @@ function Account() {
         onFinish={onEmailFinish}
         scrollToFirstError
         layout='inline'
+        style={{
+          marginBottom: '3rem',
+        }}
       >
         <Form.Item
           name="email"
@@ -120,7 +123,7 @@ function Account() {
           </Button>
         </Form.Item>
       </Form>
-      <Title level={2}
+      <Title level={3}
         style={{
           borderBottom: '1px solid #e8e8e8',
           paddingBottom: '0.5rem',
@@ -134,6 +137,9 @@ function Account() {
         onFinish={onUsernameFinish}
         scrollToFirstError
         layout='inline'
+        style={{
+          marginBottom: '3rem',
+        }}
       >
         <Form.Item
           name="username"
@@ -173,7 +179,7 @@ function Account() {
           </Button>
         </Form.Item>
       </Form>
-      <Title level={2}
+      <Title level={3}
         style={{
           borderBottom: '1px solid #e8e8e8',
           paddingBottom: '0.5rem',
@@ -181,7 +187,7 @@ function Account() {
       >
         Delete Account
       </Title>
-      <Alert 
+      <Alert
         message="Once you delete your account, there is no going back. Please be certain."
         type="warning"
         showIcon
@@ -270,7 +276,7 @@ function Password() {
 
   return (
     <>
-      <Title level={2}
+      <Title level={3}
         style={{
           borderBottom: '1px solid #e8e8e8',
           paddingBottom: '0.5rem',
@@ -361,6 +367,8 @@ function Password() {
 export default function Settings() {
 
   const [current, setCurrent] = useState('account');
+  const [username, setUsername] = useState('admin');
+  const [email, setEmail] = useState('admin@admin.com');
 
   const onClick = (e) => {
     console.log('click ', e);
@@ -369,7 +377,14 @@ export default function Settings() {
 
   return (
     <div>
-      <h1>Settings</h1>
+      <div style={{ display: 'flex', alignItems: 'center', height: 50, margin: '30px 0' }}>
+        <Avatar size={50} src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+        <div style={{ marginLeft: 10 }}>
+          <Text strong style={{fontSize: 20}}>{username}</Text><Text strong type="secondary" style={{fontSize: 20}}> ({email})</Text>
+          <br />
+          <Text type="secondary">Your personal account</Text>
+        </div>
+      </div>
       <Row gutter={32}>
         <Col xs={24} md={6}>
           <Menu
