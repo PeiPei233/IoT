@@ -16,7 +16,8 @@
     "antd": "^5.10.0",
     "antd-mobile": "^5.33.0",
     "recharts": "2.9.0",
-    "@arco-design/web-react": "2.55.0"
+    "@arco-design/web-react": "2.55.0",
+    "axios": "1.6.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

@@ -1,27 +1,76 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import './Index.css'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button, Card, App, Form, Input, Checkbox, Spin } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import axios from 'axios'
 
 function Register({ setState, setLoading }) {
   const navigate = useNavigate()
 
   const [form] = Form.useForm()
-  const [emailState, setEmailState] = useState('none')
-  const [usernameState, setUsernameState] = useState('none')
 
   const { message, modal, notification } = App.useApp()
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     console.log('Received values of form: ', values);
     setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-      message.success('Register successfully!')
-      setState(false)
-    }, 2000)
+    await axios.post('http://localhost:8080/api/user/register', values, {
+      withCredentials: true
+    })
+      .then(response => {
+        if (response.data === 'success') {
+          message.success('Register successfully!');
+          navigate('/');
+        } else {
+          message.error('Register failed!');
+        }
+      })
+      .catch(error => {
+        console.error('Request Fail:', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      })
+  }
+
+  const validateEmail = async (value) => {
+    const emailPattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+    if (!emailPattern.test(value)) {
+      if (value.length !== 0) {
+        throw new Error('The input is not valid E-mail!');
+      }
+    } else {
+      try {
+        const response = await fetch('http://localhost:8080/api/user/validateEmail?email=' + value);
+        const data = await response.text();
+        if (data === 'success') {
+          throw new Error('This email is already registered!');
+        }
+      } catch (error) {
+        throw error;
+      }
+    }
+  }
+
+  const validateUsername = async (value) => {
+    const usernamePattern = /^[a-zA-Z0-9_-]{4,16}$/;
+    if (!usernamePattern.test(value)) {
+      if (value.length !== 0) {
+        throw new Error('Username must be 4-16 characters long!');
+      }
+    } else {
+      try {
+        const response = await fetch('http://localhost:8080/api/user/validateUsername?username=' + value);
+        const data = await response.text();
+        if (data === 'success') {
+          throw new Error('This username is already registered!');
+        }
+      } catch (error) {
+        throw error;
+      }
+    }
   }
 
   return (
@@ -35,28 +84,13 @@ function Register({ setState, setLoading }) {
     >
       <Form.Item
         name="email"
-        validateStatus={emailState}
+        validateDebounce={1000}
         rules={[
           { required: true, message: 'Please input your E-mail!' },
           ({ getFieldValue }) => ({
             validator(_, value) {
               return new Promise((resolve, reject) => {
-                const emailPattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
-                if (!emailPattern.test(value)) {
-                  setEmailState('error');
-                  reject(new Error('The input is not valid E-mail!'));
-                } else {
-                  setEmailState('validating');
-                  setTimeout(() => {
-                    if (value === 'admin@admin.com') {
-                      setEmailState('error');
-                      reject(new Error('This email is already registered!'));
-                    } else {
-                      setEmailState('success');
-                      resolve();
-                    }
-                  }, 1000);
-                }
+                validateEmail(value).then(resolve).catch(reject);
               });
             },
           }),
@@ -69,29 +103,14 @@ function Register({ setState, setLoading }) {
       </Form.Item>
       <Form.Item
         name="username"
-        validateStatus={usernameState}
         hasFeedback
+        validateDebounce={1000}
         rules={[
           { required: true, message: 'Please input your Username!' },
           ({ getFieldValue }) => ({
             validator(_, value) {
               return new Promise((resolve, reject) => {
-                const usernamePattern = /^[a-zA-Z0-9_-]{4,16}$/;
-                if (!usernamePattern.test(value)) {
-                  setUsernameState('error');
-                  reject(new Error('Username must be 4-16 characters long!'));
-                } else {
-                  setUsernameState('validating');
-                  setTimeout(() => {
-                    if (value === 'admin') {
-                      setUsernameState('error');
-                      reject(new Error('This username is already registered!'));
-                    } else {
-                      setUsernameState('success');
-                      resolve();
-                    }
-                  }, 1000);
-                }
+                validateUsername(value).then(resolve).catch(reject);
               });
             },
           }),
@@ -152,17 +171,26 @@ function Login({ setState, setLoading }) {
   const [form] = Form.useForm()
   const { message, modal, notification } = App.useApp()
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     console.log('Received values of form: ', values);
-    setLoading(true)
-    setTimeout(() => {
-      if (values.username === 'admin' && values.password === 'admin') {
-        navigate('/dashboard')
-      } else {
-        message.error('Wrong username or password!')
-        setLoading(false)
-      }
-    }, 2000)
+    setLoading(true);
+    await axios.post('http://localhost:8080/api/user/login', values, {
+      withCredentials: true
+    })
+      .then(response => {
+        if (response.data === 'success') {
+          message.success('Login successfully!');
+          navigate('/dashboard');
+        } else {
+          message.error('Login failed!');
+        }
+      })
+      .catch(error => {
+        console.error('Request Fail:', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      })
   }
 
   return (
@@ -226,6 +254,7 @@ function Login({ setState, setLoading }) {
 
 function Home() {
 
+  const navigate = useNavigate()
   const [state, setState] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -244,6 +273,26 @@ function Home() {
       )
     }
   }
+
+  const validateUser = async () => {
+    await axios.get('http://localhost:8080/api/user/info', {
+      withCredentials: true
+    })
+      .then(response => {
+        if (response.status === 200) {
+          return navigate('/dashboard');
+        }
+      })
+      .catch(error => {
+        throw error;
+      })
+  }
+
+  useEffect(() => {
+    validateUser().catch((error) => {
+      console.log(error);
+    })
+  })
 
   return (
     <App className='login-register'>

@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { Menu, Form, Button, Input, Row, Col, App, Typography, Modal, Alert, Avatar } from 'antd';
+import { useState, useEffect } from 'react';
+import { Menu, Form, Button, Input, Row, Col, App, Typography, Modal, Alert, Avatar, Skeleton } from 'antd';
 import { SettingOutlined, LockOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 const { Title, Text } = Typography;
 
@@ -32,36 +33,131 @@ function Account() {
 
   const onEmailFinish = (values) => {
     console.log('Received values of form: ', values);
-    setTimeout(() => {
-      emailForm.resetFields()
-      message.success('Change email successfully!')
-    }, 2000)
+    axios.post('http://localhost:8080/api/user/changeEmail', values, {
+      withCredentials: true
+    })
+      .then(response => {
+        if (response.data === 'success') {
+          message.success('Change email successfully!');
+          emailForm.resetFields()
+        } else {
+          notification.error({
+            message: 'Change email failed!',
+            description: response.data
+          })
+        }
+      })
+      .catch(error => {
+        console.error('Request Fail:', error);
+        notification.error({
+          message: 'Change email failed!',
+          description: error.message
+        })
+      })
   }
 
   const onUsernameFinish = (values) => {
     console.log('Received values of form: ', values);
-    setTimeout(() => {
-      usernameForm.resetFields()
-      message.success('Change username successfully!')
-    }, 2000)
+    axios.post('http://localhost:8080/api/user/changeUsername', values, {
+      withCredentials: true
+    })
+      .then(response => {
+        if (response.data === 'success') {
+          message.success('Change username successfully!');
+          usernameForm.resetFields()
+        } else {
+          notification.error({
+            message: 'Change username failed!',
+            description: response.data
+          })
+        }
+      })
+      .catch(error => {
+        console.error('Request Fail:', error);
+        notification.error({
+          message: 'Change username failed!',
+          description: error.message
+        })
+      })
   }
 
   const onDeleteAccountFinish = (values) => {
     console.log('Received values of form: ', values);
-    setTimeout(() => {
-      if (values.password === '123456') {
-        deleteAccountForm.resetFields()
-        setDeleteAccountModal(false)
-        message.success('Delete account successfully!')
-        navigate('/')
-      } else {
-        message.error('Wrong password!')
-      }
-    }, 2000)
+    // setTimeout(() => {
+    //   if (values.password === '123456') {
+    //     deleteAccountForm.resetFields()
+    //     setDeleteAccountModal(false)
+    //     message.success('Delete account successfully!')
+    //     navigate('/')
+    //   } else {
+    //     message.error('Wrong password!')
+    //   }
+    // }, 2000)
+    axios.post('http://localhost:8080/api/user/delete', values, {
+      withCredentials: true
+    })
+      .then(response => {
+        if (response.data === 'success') {
+          deleteAccountForm.resetFields()
+          setDeleteAccountModal(false)
+          message.success('Delete account successfully!')
+          navigate('/')
+        } else {
+          notification.error({
+            message: 'Delete account failed!',
+            description: response.data
+          })
+        }
+      })
+      .catch(error => {
+        console.error('Request Fail:', error);
+        notification.error({
+          message: 'Delete account failed!',
+          description: error.message
+        })
+      })
   }
 
   const deleteAccount = () => {
     setDeleteAccountModal(true)
+  }
+
+  const validateEmail = async (value) => {
+    const emailPattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+    if (!emailPattern.test(value)) {
+      if (value.length !== 0) {
+        throw new Error('The input is not valid E-mail!');
+      }
+    } else {
+      try {
+        const response = await fetch('http://localhost:8080/api/user/validateEmail?email=' + value);
+        const data = await response.text();
+        if (data === 'success') {
+          throw new Error('This email is already registered!');
+        }
+      } catch (error) {
+        throw error;
+      }
+    }
+  }
+
+  const validateUsername = async (value) => {
+    const usernamePattern = /^[a-zA-Z0-9_-]{4,16}$/;
+    if (!usernamePattern.test(value)) {
+      if (value.length !== 0) {
+        throw new Error('Username must be 4-16 characters long!');
+      }
+    } else {
+      try {
+        const response = await fetch('http://localhost:8080/api/user/validateUsername?username=' + value);
+        const data = await response.text();
+        if (data === 'success') {
+          throw new Error('This username is already registered!');
+        }
+      } catch (error) {
+        throw error;
+      }
+    }
   }
 
   return (
@@ -88,27 +184,13 @@ function Account() {
         <Form.Item
           name="email"
           label="New E-mail"
-          validateStatus={emailState}
+          validateDebounce={1000}
           rules={[
+            { required: true, message: 'Please input your E-mail!' },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 return new Promise((resolve, reject) => {
-                  const emailPattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
-                  if (!emailPattern.test(value)) {
-                    setEmailState('error');
-                    reject(new Error('The input is not valid E-mail!'));
-                  } else {
-                    setEmailState('validating');
-                    setTimeout(() => {
-                      if (value === 'admin@admin.com') {
-                        setEmailState('error');
-                        reject(new Error('This email is already registered!'));
-                      } else {
-                        setEmailState('success');
-                        resolve();
-                      }
-                    }, 1000);
-                  }
+                  validateEmail(value).then(resolve).catch(reject);
                 });
               },
             }),
@@ -144,28 +226,14 @@ function Account() {
         <Form.Item
           name="username"
           label="New Username"
-          validateStatus={usernameState}
           hasFeedback
+          validateDebounce={1000}
           rules={[
+            { required: true, message: 'Please input your Username!' },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 return new Promise((resolve, reject) => {
-                  const usernamePattern = /^[a-zA-Z0-9_-]{4,16}$/;
-                  if (!usernamePattern.test(value)) {
-                    setUsernameState('error');
-                    reject(new Error('Username must be 4-16 characters long!'));
-                  } else {
-                    setUsernameState('validating');
-                    setTimeout(() => {
-                      if (value === 'admin') {
-                        setUsernameState('error');
-                        reject(new Error('This username is already registered!'));
-                      } else {
-                        setUsernameState('success');
-                        resolve();
-                      }
-                    }, 1000);
-                  }
+                  validateUsername(value).then(resolve).catch(reject);
                 });
               },
             }),
@@ -267,11 +335,30 @@ function Password() {
   const onFinish = (values) => {
     console.log('Received values of form: ', values);
     setLoadingChange(true)
-    setTimeout(() => {
-      message.success('Change password successfully!')
-      form.resetFields()
-      setLoadingChange(false)
-    }, 2000)
+    axios.post('http://localhost:8080/api/user/changePassword', values, {
+      withCredentials: true
+    })
+      .then(response => {
+        if (response.data === 'success') {
+          message.success('Change password successfully!');
+          form.resetFields()
+        } else {
+          notification.error({
+            message: 'Change password failed!',
+            description: response.data
+          })
+        }
+      })
+      .catch(error => {
+        console.error('Request Fail:', error);
+        notification.error({
+          message: 'Change password failed!',
+          description: error.message
+        })
+      })
+      .finally(() => {
+        setLoadingChange(false)
+      })
   }
 
   return (
@@ -367,8 +454,26 @@ function Password() {
 export default function Settings() {
 
   const [current, setCurrent] = useState('account');
-  const [username, setUsername] = useState('admin');
-  const [email, setEmail] = useState('admin@admin.com');
+  const [username, setUsername] = useState('unknown');
+  const [email, setEmail] = useState('unknown@unkown.com');
+  const [loadingInfo, setLoadingInfo] = useState(false)
+
+  useEffect(() => {
+    setLoadingInfo(true)
+    axios.get('http://localhost:8080/api/user/info', {
+      withCredentials: true
+    })
+      .then(response => {
+        setUsername(response.data.username)
+        setEmail(response.data.email)
+      })
+      .catch(error => {
+        console.error('Request Fail:', error);
+      })
+      .finally(() => {
+        setLoadingInfo(false)
+      })
+  }, [])
 
   const onClick = (e) => {
     console.log('click ', e);
@@ -378,12 +483,22 @@ export default function Settings() {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', height: 50, margin: '30px 0' }}>
-        <Avatar size={50} src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
-        <div style={{ marginLeft: 10 }}>
-          <Text strong style={{fontSize: 20}}>{username}</Text><Text strong type="secondary" style={{fontSize: 20}}> ({email})</Text>
-          <br />
-          <Text type="secondary">Your personal account</Text>
-        </div>
+        {!loadingInfo && <>
+          <Avatar size={50} src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+          <div style={{ marginLeft: 10 }}>
+            <Text strong style={{ fontSize: 20 }}>{username}</Text><Text strong type="secondary" style={{ fontSize: 20 }}> ({email})</Text>
+            <br />
+            <Text type="secondary">Your personal account</Text>
+          </div>
+        </>}
+        {loadingInfo && <>
+          <Skeleton.Avatar active size={50} />
+          <div style={{ marginLeft: 10 }}>
+            <Skeleton.Input style={{ width: 200 }} active size='small' />
+            <br />
+            <Skeleton.Input style={{ width: 200 }} active size='small' />
+          </div>
+        </>}
       </div>
       <Row gutter={32}>
         <Col xs={24} md={6}>

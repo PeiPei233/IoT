@@ -58,7 +58,7 @@ export default function Map({ style, markers, path }) {
       });
       if (markers) {
         for (let i = 0; i < markers.length; i++) {
-      const marker = new AMap.Marker({
+          const marker = new AMap.Marker({
             position: markers[i].position,
             title: markers[i].title,
             map: map
@@ -83,7 +83,7 @@ export default function Map({ style, markers, path }) {
 
   return (
     <div id="map" style={style}>
-      
+
     </div>
   );
 }

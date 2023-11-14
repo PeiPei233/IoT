@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppstoreOutlined, SettingOutlined, LogoutOutlined, SearchOutlined } from '@ant-design/icons';
 import reactLogo from './assets/react.svg'
 import { App, Menu, Layout, Avatar } from 'antd';
@@ -8,6 +8,7 @@ import Home from './Home.jsx';
 import Devices from './Devices.jsx';
 import Searching from './Search';
 import Settings from './Settings';
+import axios from 'axios';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -58,9 +59,10 @@ const avatarItems = [{
 }];
 
 const Dashboard = () => {
-  
+
   const navigate = useNavigate()
   const [current, setCurrent] = useState('home');
+  const { message, modal, notification } = App.useApp();
 
   function DashContent({ current }) {
     if (current === 'home') {
@@ -88,9 +90,64 @@ const Dashboard = () => {
         </div>
       )
     } else if (current === 'logout') {
-      navigate('/')
+      axios.get('http://localhost:8080/api/user/logout', {
+        withCredentials: true
+      })
+        .then(response => {
+          if (response.data === 'success') {
+            message.success('Logout successfully!');
+            setTimeout(() => {
+              navigate('/');
+            }, 1000);
+          } else {
+            notification.error({
+              message: 'Logout failed!',
+              description: 'Please try again later!',
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Request Fail:', error);
+          if (error.response.status === 400) {
+            notification.error({
+              message: 'Please login first!',
+              description: 'You have not logged in yet, please log in first!',
+            });
+            navigate('/');
+          } else {
+            notification.error({
+              message: 'Logout failed!',
+              description: error.message,
+            });
+          }
+        })
     }
   }
+
+  const validateUser = async () => {
+    await axios.get('http://localhost:8080/api/user/info', {
+      withCredentials: true
+    })
+      .then(response => {
+        if (response.status !== 200) {
+          throw new Error('Request Fail');
+        }
+      })
+      .catch(error => {
+        throw error;
+      })
+  }
+
+  useEffect(() => {
+    validateUser().catch((error) => {
+      console.error(error);
+      notification.error({
+        message: 'Please login first!',
+        description: 'You have not logged in yet, please log in first!',
+      });
+      navigate('/');
+    })
+  }, []);
 
   const onClick = (e) => {
     console.log('click ', e);
@@ -98,8 +155,7 @@ const Dashboard = () => {
   };
 
   return (
-    <App className='dashboard'>
-      <Layout style={{ minHeight: '100vh' }}>
+      <Layout style={{ minHeight: '100vh' }} className='dashboard'>
         <Header style={
           {
             background: (246, 248, 250),
@@ -142,7 +198,6 @@ const Dashboard = () => {
           }}>
           IoT Platform ©2023 Created by PeiPei</Footer>
       </Layout>
-    </App>
   )
 };
 export default Dashboard;

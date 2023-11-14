@@ -1,97 +1,25 @@
-import { Flex, Card, Spin, Empty, Button, FloatButton, Form, Input, Modal, App } from 'antd'
+import { Flex, Card, Spin, Empty, Button, FloatButton, Form, Input, Modal, App, message, notification } from 'antd'
 import { useState, useEffect, useRef } from 'react'
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 
 const { confirm } = Modal
 const { Search } = Input
 
-function requestDevicesInfo(setLoading) {
-  setLoading(true)
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      setLoading(false)
-      resolve([
-        {
-          'did': '1234567890',
-          'name': 'Device 1',
-          'type': 'Temperature Sensor',
-          'location': 'Room 1',
-          'status': 'Online'
-        },
-        {
-          'did': '1234567891',
-          'name': 'Device 2',
-          'type': 'Temperature Sensor',
-          'location': 'Room 2',
-          'status': 'Online'
-        },
-        {
-          'did': '1234567892',
-          'name': 'Device 3',
-          'type': 'Temperature Sensor',
-          'location': 'Room 3',
-          'status': 'Online'
-        },
-        {
-          'did': '1234567893',
-          'name': 'Device 4',
-          'type': 'Temperature Sensor',
-          'location': 'Room 4',
-          'status': 'Online'
-        },
-        {
-          'did': '1234567894',
-          'name': 'Device 5',
-          'type': 'Temperature Sensor',
-          'location': 'Room 5',
-          'status': 'Online'
-        },
-        {
-          'did': '1234567895',
-          'name': 'Device 6',
-          'type': 'Temperature Sensor',
-          'location': 'Room 6',
-          'status': 'Online'
-        },
-        {
-          'did': '1234567896',
-          'name': 'Device 7',
-          'type': 'Temperature Sensor',
-          'location': 'Room 7',
-          'status': 'Online'
-        },
-        {
-          'did': '1234567897',
-          'name': 'Device 8',
-          'type': 'Temperature Sensor',
-          'location': 'Room 8',
-          'status': 'Online'
-        },
-        {
-          'did': '1234567898',
-          'name': 'Device 9',
-          'type': 'Temperature Sensor',
-          'location': 'Room 9',
-          'status': 'Online'
-        },
-        {
-          'did': '1234567899',
-          'name': 'Device 10',
-          'type': 'Temperature Sensor',
-          'location': 'Room 10',
-          'status': 'Online'
-        },
-        {
-          'did': '1234567800',
-          'name': 'Device 11',
-          'type': 'Temperature Sensor',
-          'location': 'Room 11',
-          'status': 'Online'
-        }
-      ])
-    }, 2000)
-  })
+async function requestDevicesInfo() {
+  try {
+    const response = await axios.get('http://localhost:8080/api/device/list', {
+      withCredentials: true
+    })
+    if (response.status !== 200) {
+      throw new Error('Request Fail')
+    }
+    return response.data
+  } catch (error) {
+    console.error('Request Fail:', error)
+    throw error
+  }
 }
 
 export default function Devices() {
@@ -110,8 +38,16 @@ export default function Devices() {
   const [modifyForm] = Form.useForm()
 
   useEffect(() => {
-    requestDevicesInfo(setLoading).then((data) => {
+    setLoading(true)
+    requestDevicesInfo().then((data) => {
       setDevices(data)
+    })
+    .catch((error) => {
+      console.error(error)
+      setDevices([])
+    })
+    .finally(() => {
+      setLoading(false)
     })
   }, [])
 
@@ -123,19 +59,32 @@ export default function Devices() {
     setComfirmLoading(true)
     addForm.validateFields().then((values) => {
       console.log(values)
-      setTimeout(() => {
+      axios.post('http://localhost:8080/api/device/add', {
+        name: values.name,
+        type: values.type,
+        location: values.location,
+      }, {
+        withCredentials: true
+      }).then((response) => {
+        if (response.status !== 200 || response.data === 'fail') {
+          throw new Error('Request Fail')
+        }
         setOpenAddModal(false)
         setComfirmLoading(false)
         setShowAddResult(true)
         setResult({
-          'did': '9876543210',
+          'did': response.data,
           'name': values.name,
           'type': values.type,
           'location': values.location,
           'status': 'Online'
         })
         addForm.resetFields()
-      }, 2000)
+      }).catch((error) => {
+        console.error('Request Fail:', error)
+        setComfirmLoading(false)
+        message.error('Add device fail')
+      })
     }).catch((info) => {
       console.log('Validate Failed:', info)
     })
@@ -156,13 +105,38 @@ export default function Devices() {
     setComfirmLoading(true)
     modifyForm.validateFields().then((values) => {
       console.log(values)
-      setTimeout(() => {
+      axios.post('http://localhost:8080/api/device/update', {
+        did: values.did,
+        name: values.name,
+        type: values.type,
+        location: values.location,
+      }, {
+        withCredentials: true
+      }).then((response) => {
+        if (response.status !== 200 || response.data === 'fail') {
+          throw new Error('Request Fail')
+        }
         setShowModifyModal(false)
         setComfirmLoading(false)
+        setLoading(true)
         requestDevicesInfo(setLoading).then((data) => {
           setDevices(data)
         })
-      }, 2000)
+        .catch((error) => {
+          console.error(error)
+          setDevices([])
+        })
+        .finally(() => {
+          setLoading(false)
+        })
+      }).catch((error) => {
+        console.error('Request Fail:', error)
+        setComfirmLoading(false)
+        notification.error({
+          message: 'Modify device fail',
+          description: 'Please check your input and try again',
+        })
+      })
     }).catch((info) => {
       console.log('Validate Failed:', info)
     })
@@ -176,7 +150,7 @@ export default function Devices() {
     <div>
       <h1>Devices</h1>
       <Spin spinning={loading}>
-        {!loading && devices.length > 0 &&
+        {!loading && devices && devices.length > 0 &&
           <Flex wrap='wrap' gap="large">
             {devices.map((device) => (
               <Card
@@ -222,17 +196,19 @@ export default function Devices() {
       >
         <Form
           form={addForm}
-          name="control-ref"
+          name="add-device"
         >
           <Form.Item
             name="name"
             label="Device Name"
+            rules={[{ required: true, message: 'Please input device name!' }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="type"
             label="Device Type"
+            rules={[{ required: true, message: 'Please input device type!' }]}
           >
             <Input />
           </Form.Item>
@@ -265,8 +241,15 @@ export default function Devices() {
             setResult({})
             // refresh the device list
             setLoading(true)
-            requestDevicesInfo(setLoading).then((data) => {
+            requestDevicesInfo().then((data) => {
               setDevices(data)
+            })
+            .catch((error) => {
+              console.error(error)
+              setDevices([])
+            })
+            .finally(() => {
+              setLoading(false)
             })
           }}>
             Done
@@ -302,13 +285,35 @@ export default function Devices() {
                   centered: true,
                   onOk() {
                     setDeleteLoading(true)
-                    setTimeout(() => {
+                    axios.post('http://localhost:8080/api/device/delete', {
+                      did: modifyDevice.did,
+                    }, {
+                      withCredentials: true
+                    }).then((response) => {
+                      if (response.status !== 200 || response.data === 'fail') {
+                        throw new Error('Request Fail')
+                      }
                       setShowModifyModal(false)
                       setDeleteLoading(false)
+                      setLoading(true)
                       requestDevicesInfo(setLoading).then((data) => {
                         setDevices(data)
                       })
-                    }, 2000)
+                      .catch((error) => {
+                        console.error(error)
+                        setDevices([])
+                      })
+                      .finally(() => {
+                        setLoading(false)
+                      })
+                    }).catch((error) => {
+                      console.error('Request Fail:', error)
+                      setDeleteLoading(false)
+                      notification.error({
+                        message: 'Delete device fail',
+                        description: error,
+                      })
+                    })
                   },
                   onCancel() {
                     console.log('Cancel')
@@ -325,7 +330,7 @@ export default function Devices() {
       >
         <Form
           form={modifyForm}
-          name="control-ref"
+          name="modify-device"
           labelCol={{ span: 6 }}
           wrapperCol={{ span: 14 }}
         >

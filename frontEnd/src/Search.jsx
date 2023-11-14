@@ -2,104 +2,20 @@ import { useState, useEffect } from "react";
 import { Card, Select, Form, Table, DatePicker, Row, Col, Button, App } from "antd";
 import { SearchOutlined } from '@ant-design/icons';
 import Map from "./Map";
+import axios from "axios";
 
 const { RangePicker } = DatePicker;
 
-function requestOptionDevices() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        {
-          value: '1234561',
-          label: 'Device 1'
-        },
-        {
-          value: '1234562',
-          label: 'Device 2'
-        },
-        {
-          value: '1234563',
-          label: 'Device 3'
-        },
-        {
-          value: '1234564',
-          label: 'Device 4'
-        },
-        {
-          value: '1234565',
-          label: 'Device 5'
-        },
-        {
-          value: '1234566',
-          label: 'Device 6'
-        },
-        {
-          value: '1234567',
-          label: 'Device 7'
-        },
-        {
-          value: '1234568',
-          label: 'Device 8'
-        },
-        {
-          value: '1234569',
-          label: 'Device 9'
-        },
-        {
-          value: '12345610',
-          label: 'Device 10'
-        },
-        {
-          value: '12345611',
-          label: 'Device 11'
-        },
-        {
-          value: '12345612',
-          label: 'Device 12'
-        },
-        {
-          value: '12345613',
-          label: 'Device 13'
-        },
-        {
-          value: '12345614',
-          label: 'Device 14'
-        },
-        {
-          value: '12345615',
-          label: 'Device 15'
-        },
-        {
-          value: '12345616',
-          label: 'Device 16'
-        },
-        {
-          value: '12345617',
-          label: 'Device 17'
-        },
-        {
-          value: '12345618',
-          label: 'Device 18'
-        },
-        {
-          value: '12345619',
-          label: 'Device 19'
-        },
-        {
-          value: '12345620',
-          label: 'Device 20'
-        },
-        {
-          value: '12345621',
-          label: 'Device 21'
-        },
-        {
-          value: '12345622',
-          label: 'Device 22'
-        },
-      ])
-    }, 1000)
-  })
+async function requestOptionDevices() {
+  const res = await axios.get('http://localhost:8080/api/device/basicList', {
+    withCredentials: true
+  });
+  return res.data.map((item) => {
+    return {
+      label: item.name,
+      value: item.did
+    };
+  });
 }
 
 const columns = [
@@ -205,6 +121,12 @@ export default function Searching() {
           description: 'Please add devices first',
         });
       }
+    }).catch((err) => {
+      setLoadingOptions(false)
+      notification.error({
+        message: 'Failed to get devices',
+        description: err.message,
+      });
     })
   }, [])
 
@@ -221,10 +143,51 @@ export default function Searching() {
   const onFinish = (values) => {
     console.log('Received values of form: ', values);
     setSearching(true)
-    requestSearchResults().then((res) => {
-      setSearchResults(res)
+    if (!values.did) {
+      notification.error({
+        message: 'Please select a device!',
+        description: 'You have not selected a device, please select a device first!',
+      });
       setSearching(false)
+      return
+    }
+    var url = 'http://localhost:8080/api/message/list?did=' + values.did;
+    if (values.timeRange) {
+      url += '&beginTime=' + values.timeRange[0].format('YYYY-MM-DD') + '&endTime=' + values.timeRange[1].format('YYYY-MM-DD')
+    } else {
+      url += '&beginTime=&endTime='
+    }
+    axios.get(url, {
+      withCredentials: true
     })
+      .then(response => {
+        if (response.data.length === 0) {
+          notification.info({
+            message: 'No results found',
+            description: 'Please try again',
+          });
+        } else {
+          setSearchResults(response.data.map((item) => {
+            return {
+              deviceID: values.did,
+              deviceName: item.deviceName,
+              deviceType: item.type,
+              deviceStatus: item.status,
+              time: item.time,
+              location: item.location
+            }
+          }))
+        }
+        setSearching(false)
+      })
+      .catch(error => {
+        console.error('Request Fail:', error);
+        notification.error({
+          message: 'Search failed!',
+          description: error.message,
+        });
+        setSearching(false)
+      })
   }
 
   return (
