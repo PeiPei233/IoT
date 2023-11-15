@@ -9,7 +9,7 @@ const { Search } = Input
 
 async function requestDevicesInfo() {
   try {
-    const response = await axios.get('http://localhost:8080/api/device/list', {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/device/list`, {
       withCredentials: true
     })
     if (response.status !== 200) {
@@ -59,7 +59,7 @@ export default function Devices() {
     setComfirmLoading(true)
     addForm.validateFields().then((values) => {
       console.log(values)
-      axios.post('http://localhost:8080/api/device/add', {
+      axios.post(`${import.meta.env.VITE_API_URL}/api/device/add`, {
         name: values.name,
         type: values.type,
         location: values.location,
@@ -105,7 +105,7 @@ export default function Devices() {
     setComfirmLoading(true)
     modifyForm.validateFields().then((values) => {
       console.log(values)
-      axios.post('http://localhost:8080/api/device/update', {
+      axios.post(`${import.meta.env.VITE_API_URL}/api/device/update`, {
         did: values.did,
         name: values.name,
         type: values.type,
@@ -285,7 +285,7 @@ export default function Devices() {
                   centered: true,
                   onOk() {
                     setDeleteLoading(true)
-                    axios.post('http://localhost:8080/api/device/delete', {
+                    axios.post(`${import.meta.env.VITE_API_URL}/api/device/delete`, {
                       did: modifyDevice.did,
                     }, {
                       withCredentials: true

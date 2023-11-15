@@ -16,7 +16,7 @@ function Register({ setState, setLoading }) {
   const onFinish = async (values) => {
     console.log('Received values of form: ', values);
     setLoading(true)
-    await axios.post('http://localhost:8080/api/user/register', values, {
+    await axios.post(`${import.meta.env.VITE_API_URL}/api/user/register`, values, {
       withCredentials: true
     })
       .then(response => {
@@ -42,7 +42,7 @@ function Register({ setState, setLoading }) {
         throw new Error('The input is not valid E-mail!');
       }
     } else {
-      await axios.get('http://localhost:8080/api/user/validateEmail?email=' + value, {
+      await axios.get(`${import.meta.env.VITE_API_URL}/api/user/validateEmail?email=` + value, {
         withCredentials: true
       })
         .then(response => {
@@ -60,7 +60,7 @@ function Register({ setState, setLoading }) {
         throw new Error('Username must be 4-16 characters long!');
       }
     } else {
-      await axios.get('http://localhost:8080/api/user/validateUsername?username=' + value, {
+      await axios.get(`${import.meta.env.VITE_API_URL}/api/user/validateUsername?username=` + value, {
         withCredentials: true
       })
         .then(response => {
@@ -172,7 +172,7 @@ function Login({ setState, setLoading }) {
   const onFinish = async (values) => {
     console.log('Received values of form: ', values);
     setLoading(true);
-    await axios.post('http://localhost:8080/api/user/login', values, {
+    await axios.post(`${import.meta.env.VITE_API_URL}/api/user/login`, values, {
       withCredentials: true
     })
       .then(response => {
@@ -273,7 +273,7 @@ function Home() {
   }
 
   const validateUser = async () => {
-    await axios.get('http://localhost:8080/api/user/info', {
+    await axios.get(`${import.meta.env.VITE_API_URL}/api/user/info`, {
       withCredentials: true
     })
       .then(response => {

@@ -8,21 +8,21 @@ import Map from "./Map"
 import axios from "axios";
 
 async function requestDevicesData() {
-  const response = await axios.get('http://localhost:8080/api/device/briefInfo', {
+  const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/device/briefInfo`, {
     withCredentials: true
   });
   return response.data;
 }
 
 async function requestMessagesData() {
-  const response = await axios.get('http://localhost:8080/api/message/briefInfo', {
+  const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/message/briefInfo`, {
     withCredentials: true
   });
   return response.data;
 }
 
 async function requestMessagesDailyData() {
-  const response = await axios.get('http://localhost:8080/api/message/recentCount', {
+  const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/message/recentCount`, {
     withCredentials: true
   });
   return response.data.map((data) => ({
@@ -34,7 +34,7 @@ async function requestMessagesDailyData() {
 }
 
 async function requestLatestMessagesData() {
-  const response = await axios.get('http://localhost:8080/api/message/latest', {
+  const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/message/latest`, {
     withCredentials: true
   });
   return response.data.map((data) => ({
@@ -75,7 +75,7 @@ const latestMessagesColumns = [
 ]
 
 async function requestMostDevicesMessagesData() {
-  const response = await axios.get('http://localhost:8080/api/message/mostCount', {
+  const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/message/mostCount`, {
     withCredentials: true
   });
   return response.data.map((data) => ({
@@ -85,7 +85,7 @@ async function requestMostDevicesMessagesData() {
 }
 
 async function requestLatestDevicesStatusData() {
-  const response = await axios.get('http://localhost:8080/api/message/latestDevice', {
+  const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/message/latestDevice`, {
     withCredentials: true
   });
   return response.data.map((data) => ({

@@ -7,7 +7,7 @@ import axios from "axios";
 const { RangePicker } = DatePicker;
 
 async function requestOptionDevices() {
-  const res = await axios.get('http://localhost:8080/api/device/basicList', {
+  const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/device/basicList`, {
     withCredentials: true
   });
   return res.data.map((item) => {
@@ -151,7 +151,7 @@ export default function Searching() {
       setSearching(false)
       return
     }
-    var url = 'http://localhost:8080/api/message/list?did=' + values.did;
+    var url = `${import.meta.env.VITE_API_URL}/api/message/list?did=` + values.did;
     if (values.timeRange) {
       url += '&beginTime=' + values.timeRange[0].format('YYYY-MM-DD') + '&endTime=' + values.timeRange[1].format('YYYY-MM-DD')
     } else {

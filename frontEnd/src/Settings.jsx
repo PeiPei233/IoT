@@ -33,7 +33,7 @@ function Account() {
 
   const onEmailFinish = (values) => {
     console.log('Received values of form: ', values);
-    axios.post('http://localhost:8080/api/user/changeEmail', values, {
+    axios.post(`${import.meta.env.VITE_API_URL}/api/user/changeEmail`, values, {
       withCredentials: true
     })
       .then(response => {
@@ -58,7 +58,7 @@ function Account() {
 
   const onUsernameFinish = (values) => {
     console.log('Received values of form: ', values);
-    axios.post('http://localhost:8080/api/user/changeUsername', values, {
+    axios.post(`${import.meta.env.VITE_API_URL}/api/user/changeUsername`, values, {
       withCredentials: true
     })
       .then(response => {
@@ -93,7 +93,7 @@ function Account() {
     //     message.error('Wrong password!')
     //   }
     // }, 2000)
-    axios.post('http://localhost:8080/api/user/delete', values, {
+    axios.post(`${import.meta.env.VITE_API_URL}/api/user/delete`, values, {
       withCredentials: true
     })
       .then(response => {
@@ -130,7 +130,7 @@ function Account() {
       }
     } else {
       try {
-        const response = await fetch('http://localhost:8080/api/user/validateEmail?email=' + value);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/validateEmail?email=` + value);
         const data = await response.text();
         if (data === 'success') {
           throw new Error('This email is already registered!');
@@ -149,7 +149,7 @@ function Account() {
       }
     } else {
       try {
-        const response = await fetch('http://localhost:8080/api/user/validateUsername?username=' + value);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/validateUsername?username=` + value);
         const data = await response.text();
         if (data === 'success') {
           throw new Error('This username is already registered!');
@@ -335,7 +335,7 @@ function Password() {
   const onFinish = (values) => {
     console.log('Received values of form: ', values);
     setLoadingChange(true)
-    axios.post('http://localhost:8080/api/user/changePassword', values, {
+    axios.post(`${import.meta.env.VITE_API_URL}/api/user/changePassword`, values, {
       withCredentials: true
     })
       .then(response => {
@@ -460,7 +460,7 @@ export default function Settings() {
 
   useEffect(() => {
     setLoadingInfo(true)
-    axios.get('http://localhost:8080/api/user/info', {
+    axios.get(`${import.meta.env.VITE_API_URL}/api/user/info`, {
       withCredentials: true
     })
       .then(response => {

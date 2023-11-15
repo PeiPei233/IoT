@@ -90,7 +90,7 @@ const Dashboard = () => {
         </div>
       )
     } else if (current === 'logout') {
-      axios.get('http://localhost:8080/api/user/logout', {
+      axios.get(`${import.meta.env.VITE_API_URL}/api/user/logout`, {
         withCredentials: true
       })
         .then(response => {
@@ -125,7 +125,7 @@ const Dashboard = () => {
   }
 
   const validateUser = async () => {
-    await axios.get('http://localhost:8080/api/user/info', {
+    await axios.get(`${import.meta.env.VITE_API_URL}/api/user/info`, {
       withCredentials: true
     })
       .then(response => {
