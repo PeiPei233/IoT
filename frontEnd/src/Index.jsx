@@ -42,15 +42,14 @@ function Register({ setState, setLoading }) {
         throw new Error('The input is not valid E-mail!');
       }
     } else {
-      try {
-        const response = await fetch('http://localhost:8080/api/user/validateEmail?email=' + value);
-        const data = await response.text();
-        if (data === 'success') {
-          throw new Error('This email is already registered!');
-        }
-      } catch (error) {
-        throw error;
-      }
+      await axios.get('http://localhost:8080/api/user/validateEmail?email=' + value, {
+        withCredentials: true
+      })
+        .then(response => {
+          if (response.data === 'success') {
+            throw new Error('This email is already registered!');
+          }
+        })
     }
   }
 
@@ -61,15 +60,14 @@ function Register({ setState, setLoading }) {
         throw new Error('Username must be 4-16 characters long!');
       }
     } else {
-      try {
-        const response = await fetch('http://localhost:8080/api/user/validateUsername?username=' + value);
-        const data = await response.text();
-        if (data === 'success') {
-          throw new Error('This username is already registered!');
-        }
-      } catch (error) {
-        throw error;
-      }
+      await axios.get('http://localhost:8080/api/user/validateUsername?username=' + value, {
+        withCredentials: true
+      })
+        .then(response => {
+          if (response.data === 'success') {
+            throw new Error('This username is already registered!');
+          }
+        })
     }
   }
 
