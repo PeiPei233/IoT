@@ -281,9 +281,6 @@ function Home() {
           return navigate('/dashboard');
         }
       })
-      .catch(error => {
-        throw error;
-      })
   }
 
   useEffect(() => {

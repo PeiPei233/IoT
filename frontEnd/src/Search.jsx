@@ -51,55 +51,6 @@ const columns = [
   }
 ];
 
-function requestSearchResults() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        {
-          deviceID: '10000',
-          deviceName: 'Device 1',
-          deviceType: 'Type 1',
-          deviceStatus: 'Normal',
-          time: '2023/11/12 10:15:30',
-          location: '119.150,30.160'
-        },
-        {
-          deviceID: '10000',
-          deviceName: 'Device 1',
-          deviceType: 'Type 1',
-          deviceStatus: 'Warning',
-          time: '2023/11/12 12:45:00',
-          location: '119.200,30.200'
-        },
-        {
-          deviceID: '10000',
-          deviceName: 'Device 1',
-          deviceType: 'Type 1',
-          deviceStatus: 'Critical',
-          time: '2023/11/12 14:30:15',
-          location: '119.250,30.250'
-        },
-        {
-          deviceID: '10000',
-          deviceName: 'Device 1',
-          deviceType: 'Type 1',
-          deviceStatus: 'Offline',
-          time: '2023/11/12 16:05:45',
-          location: '119.300,30.300'
-        },
-        {
-          deviceID: '10000',
-          deviceName: 'Device 1',
-          deviceType: 'Type 1',
-          deviceStatus: 'Normal',
-          time: '2023/11/12 18:20:30',
-          location: '119.350,30.350'
-        }
-      ])
-    }, 1000)
-  })
-}
-
 export default function Searching() {
 
   const [form] = Form.useForm()
