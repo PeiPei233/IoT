@@ -1,7 +1,7 @@
 package bs.backend.service;
 
 import bs.backend.common.MessageCount;
-import bs.backend.common.MessageInfo;
+import bs.backend.model.MessageInfo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

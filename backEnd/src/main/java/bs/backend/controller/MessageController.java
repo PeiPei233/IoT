@@ -1,7 +1,7 @@
 package bs.backend.controller;
 
 import bs.backend.common.MessageCount;
-import bs.backend.common.MessageInfo;
+import bs.backend.model.MessageInfo;
 import bs.backend.service.MessageService;
 import bs.backend.service.ServiceResult;
 import jakarta.servlet.http.HttpSession;
@@ -119,7 +119,7 @@ public class MessageController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<MessageInfo>> getMessages(@RequestParam String did, @RequestParam String beginTime, @RequestParam String endTime, HttpSession session) {
+    public ResponseEntity<List<MessageInfo>> getMessages(@RequestParam String did, @RequestParam(defaultValue = "") String beginTime, @RequestParam(defaultValue = "") String endTime, HttpSession session) {
         if (session.getAttribute("uid") == null) {
             return ResponseEntity.badRequest().body(null);
         }

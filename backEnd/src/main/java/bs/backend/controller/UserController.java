@@ -1,6 +1,6 @@
 package bs.backend.controller;
 
-import bs.backend.common.UserInfo;
+import bs.backend.model.UserInfo;
 import bs.backend.service.ServiceResult;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class UserController {
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
         ServiceResult result = userService.validate(loginRequest.getUsername(), loginRequest.getPassword());
         if (result.getSuccess()) {
-            session.setAttribute("uid", result.getData());
+            session.setAttribute("uid", result.getData().toString());
             return ResponseEntity.ok("success");
         } else {
             return ResponseEntity.ok("fail");

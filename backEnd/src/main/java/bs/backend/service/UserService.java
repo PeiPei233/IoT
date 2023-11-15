@@ -1,41 +1,68 @@
 package bs.backend.service;
 
-import bs.backend.common.UserInfo;
+import bs.backend.model.UserInfo;
+import bs.backend.mapper.UserMapper;
+import bs.backend.model.User;
+import org.apache.ibatis.exceptions.PersistenceException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service   
 public class UserService {
 
+    private final UserMapper userMapper;
+
+    @Autowired
+    public UserService(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
+
     public ServiceResult validate(String username, String password) {
-        if (username.equals("admin") && password.equals("admin")) {
-            return new ServiceResult(true, "001");
+        User user = userMapper.getUserByUsername(username);
+        if (user != null && user.getPassword().equals(password)) {
+            return new ServiceResult(true, user.getUid().toString());
         } else {
-            return new ServiceResult(false);
+        return new ServiceResult(false, "Wrong username or password");
         }
     }
 
     public ServiceResult register(String username, String password, String email) {
-        return new ServiceResult(true);
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setEmail(email);
+        try {
+            userMapper.insertUser(user);
+            return new ServiceResult(true);
+        } catch (PersistenceException e) {
+            return new ServiceResult(false, "Username or email already exists");
+        } catch (Exception e) {
+            return new ServiceResult(false, e.getMessage());
+        }
     }
 
     public ServiceResult validateUsername(String username) {
-        if (username.equals("admin")) {
-            return new ServiceResult(true, "001");
+        User user = userMapper.getUserByUsername(username);
+        if (user != null) {
+            return new ServiceResult(true, user.getUid());
         } else {
             return new ServiceResult(false);
         }
     }
 
     public ServiceResult validateEmail(String email) {
-        if (email.equals("admin@admin.com")) {
-            return new ServiceResult(true, "001");
+        User user = userMapper.getUserByEmail(email);
+        if (user != null) {
+            return new ServiceResult(true, user.getUid());
         } else {
             return new ServiceResult(false);
         }
     }
 
     public ServiceResult delete(String uid, String password) {
-        if (password.equals("admin")) {
+        User user = userMapper.getUserByUid(Integer.parseInt(uid));
+        if (user != null && user.getPassword().equals(password)) {
+            userMapper.deleteUserByUid(Integer.parseInt(uid));
             return new ServiceResult(true);
         } else {
             return new ServiceResult(false, "Wrong password");
@@ -43,15 +70,30 @@ public class UserService {
     }
 
     public ServiceResult getUserInfo(String uid) {
-        return new ServiceResult(true, new UserInfo("001", "admin", "admin@admin.com"));
+        User user = userMapper.getUserByUid(Integer.parseInt(uid));
+        if (user != null) {
+            return new ServiceResult(true, new UserInfo(uid, user.getUsername(), user.getEmail()));
+        } else {
+            return new ServiceResult(false, "User not found");
+        }
     }
 
     public ServiceResult updateUsername(String uid, String username) {
-        return new ServiceResult(true);
+        User user = userMapper.getUserByUid(Integer.parseInt(uid));
+        if (user != null) {
+            user.setUsername(username);
+            userMapper.updateUser(user);
+            return new ServiceResult(true);
+        } else {
+            return new ServiceResult(false, "User not found");
+        }
     }
 
     public ServiceResult updatePassword(String uid, String oldPassword, String newPassword) {
-        if (oldPassword.equals("admin")) {
+        User user = userMapper.getUserByUid(Integer.parseInt(uid));
+        if (user != null && user.getPassword().equals(oldPassword)) {
+            user.setPassword(newPassword);
+            userMapper.updateUser(user);
             return new ServiceResult(true);
         } else {
             return new ServiceResult(false, "Wrong password");
@@ -59,7 +101,14 @@ public class UserService {
     }
 
     public ServiceResult updateEmail(String uid, String email) {
-        return new ServiceResult(true);
+        User user = userMapper.getUserByUid(Integer.parseInt(uid));
+        if (user != null) {
+            user.setEmail(email);
+            userMapper.updateUser(user);
+            return new ServiceResult(true);
+        } else {
+            return new ServiceResult(false, "User not found");
+        }
     }
 
 }

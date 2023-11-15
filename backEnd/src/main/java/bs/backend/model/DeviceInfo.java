@@ -1,4 +1,4 @@
-package bs.backend.common;
+package bs.backend.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +16,14 @@ public class DeviceInfo {
     private String uid;
 
     public DeviceInfo(String did) {
+        this.did = did;
+    }
+
+    public void setDid(int did) {
+        this.did = String.valueOf(did);
+    }
+
+    public void setDid(String did) {
         this.did = did;
     }
 

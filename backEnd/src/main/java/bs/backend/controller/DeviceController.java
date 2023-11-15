@@ -1,6 +1,7 @@
 package bs.backend.controller;
 
-import bs.backend.common.DeviceInfo;
+import bs.backend.model.Device;
+import bs.backend.model.DeviceInfo;
 import bs.backend.service.DeviceService;
 import bs.backend.service.ServiceResult;
 import jakarta.servlet.http.HttpSession;
@@ -43,14 +44,14 @@ public class DeviceController {
     }
 
     @GetMapping("/basicList")
-    public ResponseEntity<List<DeviceInfo>> getDeviceBasicList(HttpSession session) {
+    public ResponseEntity<List<Device>> getDeviceBasicList(HttpSession session) {
         String uid = (String) session.getAttribute("uid");
         ServiceResult result = deviceService.getDeviceBasicList(uid);
         if (result.getSuccess()) {
             Object data = result.getData();
             if (data instanceof List<?> list) {
-                if (!list.isEmpty() && list.get(0) instanceof DeviceInfo) {
-                    return ResponseEntity.ok((List<DeviceInfo>) list);
+                if (!list.isEmpty() && list.get(0) instanceof Device) {
+                    return ResponseEntity.ok((List<Device>) list);
                 }
             }
             return ResponseEntity.badRequest().body(null);
@@ -60,22 +61,22 @@ public class DeviceController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<String> addDevice(@RequestBody DeviceInfo deviceInfo, HttpSession session) {
+    public ResponseEntity<String> addDevice(@RequestBody Device device, HttpSession session) {
         String uid = (String) session.getAttribute("uid");
-        deviceInfo.setUid(uid);
-        ServiceResult result = deviceService.addDevice(deviceInfo);
+        device.setUid(Integer.parseInt(uid));
+        ServiceResult result = deviceService.addDevice(device);
         if (result.getSuccess()) {
-            return ResponseEntity.ok(deviceInfo.getDid());
+            return ResponseEntity.ok(device.getDid().toString());
         } else {
             return ResponseEntity.ok("fail");
         }
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<String> deleteDevice(@RequestBody DeviceInfo deviceInfo, HttpSession session) {
+    public ResponseEntity<String> deleteDevice(@RequestBody Device device, HttpSession session) {
         String uid = (String) session.getAttribute("uid");
-        deviceInfo.setUid(uid);
-        ServiceResult result = deviceService.deleteDevice(deviceInfo);
+        device.setUid(Integer.parseInt(uid));
+        ServiceResult result = deviceService.deleteDevice(device);
         if (result.getSuccess()) {
             return ResponseEntity.ok("success");
         } else {
@@ -84,10 +85,10 @@ public class DeviceController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<String> updateDevice(@RequestBody DeviceInfo deviceInfo, HttpSession session) {
+    public ResponseEntity<String> updateDevice(@RequestBody Device device, HttpSession session) {
         String uid = (String) session.getAttribute("uid");
-        deviceInfo.setUid(uid);
-        ServiceResult result = deviceService.updateDevice(deviceInfo);
+        device.setUid(Integer.parseInt(uid));
+        ServiceResult result = deviceService.updateDevice(device);
         if (result.getSuccess()) {
             return ResponseEntity.ok("success");
         } else {
