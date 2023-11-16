@@ -29,7 +29,7 @@ public class DeviceController {
     public ResponseEntity<List<Device>> getDeviceList(HttpSession session) {
         Integer uid = (Integer) session.getAttribute("uid");
         ServiceResult result = deviceService.getDeviceList(uid);
-        if (result.getSuccess()) {
+        if (result.isSuccess()) {
             Object data = result.getData();
             if (data instanceof List<?> list) {
                 if (list.isEmpty() || list.get(0) instanceof Device) {
@@ -45,7 +45,7 @@ public class DeviceController {
         Integer uid = (Integer) session.getAttribute("uid");
         device.setUid(uid);
         ServiceResult result = deviceService.addDevice(device);
-        if (result.getSuccess()) {
+        if (result.isSuccess()) {
             return ResponseEntity.ok(device.getDid().toString());
         } else {
             return ResponseEntity.ok("fail");
@@ -57,7 +57,7 @@ public class DeviceController {
         Integer uid = (Integer) session.getAttribute("uid");
         device.setUid(uid);
         ServiceResult result = deviceService.deleteDevice(device);
-        if (result.getSuccess()) {
+        if (result.isSuccess()) {
             return ResponseEntity.ok("success");
         } else {
             return ResponseEntity.ok("fail");
@@ -69,7 +69,7 @@ public class DeviceController {
         Integer uid = (Integer) session.getAttribute("uid");
         device.setUid(uid);
         ServiceResult result = deviceService.updateDevice(device);
-        if (result.getSuccess()) {
+        if (result.isSuccess()) {
             return ResponseEntity.ok("success");
         } else {
             return ResponseEntity.ok("fail");
@@ -90,7 +90,7 @@ public class DeviceController {
         Integer uid = (Integer) session.getAttribute("uid");
         ServiceResult activeResult = deviceService.getActiveDeviceCount(uid);
         ServiceResult totalResult = deviceService.getDeviceCount(uid);
-        if (activeResult.getSuccess() && totalResult.getSuccess()) {
+        if (activeResult.isSuccess() && totalResult.isSuccess()) {
             Object activeData = activeResult.getData();
             Object totalData = totalResult.getData();
             if (activeData instanceof Integer active && totalData instanceof Integer total) {

@@ -33,7 +33,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
         ServiceResult result = userService.validate(loginRequest.getUsername(), loginRequest.getPassword());
-        if (result.getSuccess()) {
+        if (result.isSuccess()) {
             session.setAttribute("uid", result.getData());
             return ResponseEntity.ok("success");
         } else {
@@ -54,7 +54,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User user) {
         ServiceResult result = userService.register(user.getUsername(), user.getPassword(), user.getEmail());
-        if (result.getSuccess()) {
+        if (result.isSuccess()) {
             return ResponseEntity.ok("success");
         } else {
             return ResponseEntity.ok("fail");
@@ -65,7 +65,7 @@ public class UserController {
     public ResponseEntity<String> delete(@RequestBody User user, HttpSession session) {
         if (session.getAttribute("uid") != null) {
             ServiceResult result = userService.delete((Integer) session.getAttribute("uid"), user.getPassword());
-            if (result.getSuccess()) {
+            if (result.isSuccess()) {
                 session.invalidate();
                 return ResponseEntity.ok("success");
             } else {
@@ -79,7 +79,7 @@ public class UserController {
     @GetMapping("/validateUsername")
     public ResponseEntity<String> validateUsername(@RequestParam String username) {
         ServiceResult result = userService.validateUsername(username);
-        if (result.getSuccess()) {
+        if (result.isSuccess()) {
             return ResponseEntity.ok("success");
         } else {
             return ResponseEntity.ok("fail");
@@ -89,7 +89,7 @@ public class UserController {
     @GetMapping("/validateEmail")
     public ResponseEntity<String> validateEmail(@RequestParam String email) {
         ServiceResult result = userService.validateEmail(email);
-        if (result.getSuccess()) {
+        if (result.isSuccess()) {
             return ResponseEntity.ok("success");
         } else {
             return ResponseEntity.ok("fail");
@@ -100,7 +100,7 @@ public class UserController {
     public ResponseEntity<User> getUserInfo(HttpSession session) {
         if (session.getAttribute("uid") != null) {
             ServiceResult result = userService.getUserInfo((Integer) session.getAttribute("uid"));
-            if (result.getSuccess()) {
+            if (result.isSuccess()) {
                 return ResponseEntity.ok((User) result.getData());
             } else {
                 return ResponseEntity.badRequest().body(null);
@@ -114,7 +114,7 @@ public class UserController {
     public ResponseEntity<String> changeUsername(@RequestBody User user, HttpSession session) {
         if (session.getAttribute("uid") != null) {
             ServiceResult result = userService.updateUsername((Integer) session.getAttribute("uid"), user.getUsername());
-            if (result.getSuccess()) {
+            if (result.isSuccess()) {
                 return ResponseEntity.ok("success");
             } else {
                 return ResponseEntity.ok("fail");
@@ -134,7 +134,7 @@ public class UserController {
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest, HttpSession session) {
         if (session.getAttribute("uid") != null) {
             ServiceResult result = userService.updatePassword((Integer) session.getAttribute("uid"), changePasswordRequest.getOldPassword(), changePasswordRequest.getNewPassword());
-            if (result.getSuccess()) {
+            if (result.isSuccess()) {
                 return ResponseEntity.ok("success");
             } else {
                 return ResponseEntity.ok((String) result.getData());
@@ -148,7 +148,7 @@ public class UserController {
     public ResponseEntity<String> changeEmail(@RequestBody User user, HttpSession session) {
         if (session.getAttribute("uid") != null && user.getEmail() != null) {
             ServiceResult result = userService.updateEmail((Integer) session.getAttribute("uid"), user.getEmail());
-            if (result.getSuccess()) {
+            if (result.isSuccess()) {
                 return ResponseEntity.ok("success");
             } else {
                 return ResponseEntity.ok("fail");

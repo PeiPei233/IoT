@@ -32,7 +32,7 @@ public class MessageController {
         }
         Integer uid = (Integer) session.getAttribute("uid");
         ServiceResult result = messageService.getMessagesCount(uid);
-        if (result.getSuccess()) {
+        if (result.isSuccess()) {
             Object data = result.getData();
             if (data instanceof MessageCount messageCount) {
                 return ResponseEntity.ok(messageCount);
@@ -51,7 +51,7 @@ public class MessageController {
         LocalDate today = LocalDate.now();
         for (int i = 6; i >= 0; i--) {
             ServiceResult serviceResult = messageService.getMessagesCount(uid, today.minusDays(i).toString(), today.minusDays(i).toString());
-            if (serviceResult.getSuccess()) {
+            if (serviceResult.isSuccess()) {
                 Object data = serviceResult.getData();
                 if (data instanceof MessageCount messageCount) {
                     messageCount.setTime(today.minusDays(i).toString());
@@ -71,7 +71,7 @@ public class MessageController {
         }
         Integer uid = (Integer) session.getAttribute("uid");
         ServiceResult result = messageService.getMessages(uid, null, null);
-        if (result.getSuccess()) {
+        if (result.isSuccess()) {
             Object data = result.getData();
             if (data instanceof List<?> list) {
                 if (list.isEmpty() || list.get(0) instanceof MessageInfo) {
@@ -89,7 +89,7 @@ public class MessageController {
         }
         Integer uid = (Integer) session.getAttribute("uid");
         ServiceResult result = messageService.getMostMessageDevices(uid);
-        if (result.getSuccess()) {
+        if (result.isSuccess()) {
             Object data = result.getData();
             if (data instanceof List<?> list) {
                 if (list.isEmpty() || list.get(0) instanceof MessageCount) {
@@ -107,7 +107,7 @@ public class MessageController {
         }
         Integer uid = (Integer) session.getAttribute("uid");
         ServiceResult result = messageService.getDeviceLatestEach(uid);
-        if (result.getSuccess()) {
+        if (result.isSuccess()) {
             Object data = result.getData();
             if (data instanceof List<?> list) {
                 if (list.isEmpty() || list.get(0) instanceof MessageInfo) {
@@ -125,7 +125,7 @@ public class MessageController {
         }
         Integer uid = (Integer) session.getAttribute("uid");
         ServiceResult result = messageService.getMessages(uid, did, beginTime, endTime);
-        if (result.getSuccess()) {
+        if (result.isSuccess()) {
             Object data = result.getData();
             if (data instanceof List<?> list) {
                 if (list.isEmpty() || list.get(0) instanceof MessageInfo) {
