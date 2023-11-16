@@ -1,7 +1,6 @@
 package bs.backend.mapper;
 
 import bs.backend.model.Device;
-import bs.backend.model.DeviceInfo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -15,5 +14,5 @@ public interface DeviceMapper {
     void deleteDeviceByDid(Integer did);
     int getDeviceCountByUid(Integer uid);
     int getActiveDeviceCountByUid(Integer uid);
-    List<DeviceInfo> getDeviceInfosByUid(Integer uid);
+    void updateDeviceStatusByDid(Integer did, Integer status);
 }

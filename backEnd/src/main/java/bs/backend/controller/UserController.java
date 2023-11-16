@@ -1,9 +1,10 @@
 package bs.backend.controller;
 
-import bs.backend.model.UserInfo;
+import bs.backend.model.User;
 import bs.backend.service.ServiceResult;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +34,7 @@ public class UserController {
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
         ServiceResult result = userService.validate(loginRequest.getUsername(), loginRequest.getPassword());
         if (result.getSuccess()) {
-            session.setAttribute("uid", result.getData().toString());
+            session.setAttribute("uid", result.getData());
             return ResponseEntity.ok("success");
         } else {
             return ResponseEntity.ok("fail");
@@ -51,8 +52,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody UserInfo registerRequest) {
-        ServiceResult result = userService.register(registerRequest.getUsername(), registerRequest.getPassword(), registerRequest.getEmail());
+    public ResponseEntity<String> register(@RequestBody User user) {
+        ServiceResult result = userService.register(user.getUsername(), user.getPassword(), user.getEmail());
         if (result.getSuccess()) {
             return ResponseEntity.ok("success");
         } else {
@@ -61,9 +62,9 @@ public class UserController {
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<String> delete(@RequestBody UserInfo userInfo, HttpSession session) {
+    public ResponseEntity<String> delete(@RequestBody User user, HttpSession session) {
         if (session.getAttribute("uid") != null) {
-            ServiceResult result = userService.delete((String) session.getAttribute("uid"), userInfo.getPassword());
+            ServiceResult result = userService.delete((Integer) session.getAttribute("uid"), user.getPassword());
             if (result.getSuccess()) {
                 session.invalidate();
                 return ResponseEntity.ok("success");
@@ -96,11 +97,11 @@ public class UserController {
     }
 
     @GetMapping("/info")
-    public ResponseEntity<UserInfo> getUserInfo(HttpSession session) {
+    public ResponseEntity<User> getUserInfo(HttpSession session) {
         if (session.getAttribute("uid") != null) {
-            ServiceResult result = userService.getUserInfo((String) session.getAttribute("uid"));
+            ServiceResult result = userService.getUserInfo((Integer) session.getAttribute("uid"));
             if (result.getSuccess()) {
-                return ResponseEntity.ok((UserInfo) result.getData());
+                return ResponseEntity.ok((User) result.getData());
             } else {
                 return ResponseEntity.badRequest().body(null);
             }
@@ -110,9 +111,9 @@ public class UserController {
     }
 
     @PostMapping("/changeUsername")
-    public ResponseEntity<String> changeUsername(@RequestBody UserInfo userInfo, HttpSession session) {
+    public ResponseEntity<String> changeUsername(@RequestBody User user, HttpSession session) {
         if (session.getAttribute("uid") != null) {
-            ServiceResult result = userService.updateUsername((String) session.getAttribute("uid"), userInfo.getUsername());
+            ServiceResult result = userService.updateUsername((Integer) session.getAttribute("uid"), user.getUsername());
             if (result.getSuccess()) {
                 return ResponseEntity.ok("success");
             } else {
@@ -132,7 +133,7 @@ public class UserController {
     @PostMapping("/changePassword")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest, HttpSession session) {
         if (session.getAttribute("uid") != null) {
-            ServiceResult result = userService.updatePassword((String) session.getAttribute("uid"), changePasswordRequest.getOldPassword(), changePasswordRequest.getNewPassword());
+            ServiceResult result = userService.updatePassword((Integer) session.getAttribute("uid"), changePasswordRequest.getOldPassword(), changePasswordRequest.getNewPassword());
             if (result.getSuccess()) {
                 return ResponseEntity.ok("success");
             } else {
@@ -144,9 +145,9 @@ public class UserController {
     }
 
     @PostMapping("/changeEmail")
-    public ResponseEntity<String> changeEmail(@RequestBody UserInfo userInfo, HttpSession session) {
-        if (session.getAttribute("uid") != null && userInfo.getEmail() != null) {
-            ServiceResult result = userService.updateEmail((String) session.getAttribute("uid"), userInfo.getEmail());
+    public ResponseEntity<String> changeEmail(@RequestBody User user, HttpSession session) {
+        if (session.getAttribute("uid") != null && user.getEmail() != null) {
+            ServiceResult result = userService.updateEmail((Integer) session.getAttribute("uid"), user.getEmail());
             if (result.getSuccess()) {
                 return ResponseEntity.ok("success");
             } else {

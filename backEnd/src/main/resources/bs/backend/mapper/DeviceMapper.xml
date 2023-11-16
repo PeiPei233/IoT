@@ -2,11 +2,15 @@
 <mapper namespace="bs.backend.mapper.DeviceMapper">
 
     <select id="getDeviceByDid" resultType="bs.backend.model.Device">
-        SELECT * FROM device WHERE did = #{did}
+        SELECT *
+        FROM device
+        WHERE did = #{did}
     </select>
 
     <select id="getDevicesByUid" resultType="bs.backend.model.Device">
-        SELECT * FROM device WHERE uid = #{uid}
+        SELECT *
+        FROM device
+        WHERE uid = #{uid}
     </select>
 
     <insert id="insertDevice" parameterType="bs.backend.model.Device" useGeneratedKeys="true" keyProperty="did">
@@ -15,43 +19,36 @@
     </insert>
 
     <update id="updateDevice" parameterType="bs.backend.model.Device">
-        UPDATE device SET name = #{name}, type = #{type}, location = #{location}
+        UPDATE device
+        SET name     = #{name},
+            type     = #{type},
+            location = #{location}
         WHERE did = #{did}
     </update>
 
     <delete id="deleteDeviceByDid" parameterType="Integer">
-        DELETE FROM device WHERE did = #{did}
+        DELETE
+        FROM device
+        WHERE did = #{did}
     </delete>
 
     <select id="getDeviceCountByUid" parameterType="Integer" resultType="Integer">
-        SELECT COUNT(*) FROM device WHERE uid = #{uid}
+        SELECT COUNT(*)
+        FROM device
+        WHERE uid = #{uid}
     </select>
 
     <select id="getActiveDeviceCountByUid" parameterType="Integer" resultType="Integer">
-        SELECT COUNT(DISTINCT d.did)
-        FROM device d
-        JOIN (
-            SELECT m1.did
-            FROM message m1
-            WHERE m1.status > 0 AND m1.timestamp = (
-                SELECT MAX(m2.timestamp)
-                FROM message m2
-                WHERE m2.did = m1.did
-            )
-        ) AS latest_active_message ON d.did = latest_active_message.did
-        WHERE d.uid = #{uid}
+        SELECT COUNT(*)
+        FROM device
+        WHERE uid = #{uid}
+          AND status = 0
     </select>
 
-    <select id="getDeviceInfosByUid" parameterType="Integer" resultType="bs.backend.model.DeviceInfo">
-        SELECT d.did, d.name, d.type, d.location, m.status, d.uid
-        FROM device AS d
-                 LEFT JOIN (
-            SELECT did, MAX(timestamp) AS max_timestamp
-            FROM message
-            GROUP BY did
-        ) AS latest_msg ON d.did = latest_msg.did
-                 LEFT JOIN message AS m ON d.did = m.did AND latest_msg.max_timestamp = m.timestamp
-        WHERE d.uid = 123;
-    </select>
+    <update id="updateDeviceStatusByDid" parameterType="Integer">
+        UPDATE device
+        SET status = #{status}
+        WHERE did = #{did}
+    </update>
 
 </mapper>

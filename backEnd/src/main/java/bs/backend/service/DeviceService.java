@@ -2,7 +2,6 @@ package bs.backend.service;
 
 import bs.backend.mapper.DeviceMapper;
 import bs.backend.model.Device;
-import bs.backend.model.DeviceInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,17 +17,9 @@ public class DeviceService {
         this.deviceMapper = deviceMapper;
     }
 
-    public ServiceResult getDeviceList(String uid) {
-        return new ServiceResult(true, deviceMapper.getDeviceInfosByUid(Integer.parseInt(uid)));
+    public ServiceResult getDeviceList(Integer uid) {
+        return new ServiceResult(true, deviceMapper.getDevicesByUid(uid));
     }
-
-    public ServiceResult getDeviceBasicList(String uid) {
-        return new ServiceResult(true, deviceMapper.getDevicesByUid(Integer.parseInt(uid)));
-    }
-
-//    public ServiceResult getDeviceDetail(String did) {
-//        return new ServiceResult(true, new DeviceInfo(did, "Device 1", "Light", "Living Room", "On"));
-//    }
 
     public ServiceResult addDevice(Device device) {
         try {
@@ -57,17 +48,17 @@ public class DeviceService {
         }
     }
 
-    public ServiceResult getActiveDeviceCount(String uid) {
+    public ServiceResult getActiveDeviceCount(Integer uid) {
         try {
-            return new ServiceResult(true, deviceMapper.getActiveDeviceCountByUid(Integer.parseInt(uid)));
+            return new ServiceResult(true, deviceMapper.getActiveDeviceCountByUid(uid));
         } catch (Exception e) {
             return new ServiceResult(false);
         }
     }
 
-    public ServiceResult getDeviceCount(String uid) {
+    public ServiceResult getDeviceCount(Integer uid) {
         try {
-            return new ServiceResult(true, deviceMapper.getDeviceCountByUid(Integer.parseInt(uid)));
+            return new ServiceResult(true, deviceMapper.getDeviceCountByUid(uid));
         } catch (Exception e) {
             return new ServiceResult(false);
         }

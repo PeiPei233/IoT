@@ -30,7 +30,7 @@ public class MessageController {
         if (session.getAttribute("uid") == null) {
             return ResponseEntity.badRequest().body(null);
         }
-        String uid = (String) session.getAttribute("uid");
+        Integer uid = (Integer) session.getAttribute("uid");
         ServiceResult result = messageService.getMessagesCount(uid);
         if (result.getSuccess()) {
             Object data = result.getData();
@@ -46,7 +46,7 @@ public class MessageController {
         if (session.getAttribute("uid") == null) {
             return ResponseEntity.badRequest().body(null);
         }
-        String uid = (String) session.getAttribute("uid");
+        Integer uid = (Integer) session.getAttribute("uid");
         List<MessageCount> result = new ArrayList<>();
         LocalDate today = LocalDate.now();
         for (int i = 6; i >= 0; i--) {
@@ -69,12 +69,12 @@ public class MessageController {
         if (session.getAttribute("uid") == null) {
             return ResponseEntity.badRequest().body(null);
         }
-        String uid = (String) session.getAttribute("uid");
+        Integer uid = (Integer) session.getAttribute("uid");
         ServiceResult result = messageService.getMessages(uid, null, null);
         if (result.getSuccess()) {
             Object data = result.getData();
             if (data instanceof List<?> list) {
-                if (!list.isEmpty() && list.get(0) instanceof MessageInfo) {
+                if (list.isEmpty() || list.get(0) instanceof MessageInfo) {
                     return ResponseEntity.ok((List<MessageInfo>) list);
                 }
             }
@@ -87,12 +87,12 @@ public class MessageController {
         if (session.getAttribute("uid") == null) {
             return ResponseEntity.badRequest().body(null);
         }
-        String uid = (String) session.getAttribute("uid");
+        Integer uid = (Integer) session.getAttribute("uid");
         ServiceResult result = messageService.getMostMessageDevices(uid);
         if (result.getSuccess()) {
             Object data = result.getData();
             if (data instanceof List<?> list) {
-                if (!list.isEmpty() && list.get(0) instanceof MessageCount) {
+                if (list.isEmpty() || list.get(0) instanceof MessageCount) {
                     return ResponseEntity.ok((List<MessageCount>) list);
                 }
             }
@@ -105,12 +105,12 @@ public class MessageController {
         if (session.getAttribute("uid") == null) {
             return ResponseEntity.badRequest().body(null);
         }
-        String uid = (String) session.getAttribute("uid");
+        Integer uid = (Integer) session.getAttribute("uid");
         ServiceResult result = messageService.getDeviceLatestEach(uid);
         if (result.getSuccess()) {
             Object data = result.getData();
             if (data instanceof List<?> list) {
-                if (!list.isEmpty() && list.get(0) instanceof MessageInfo) {
+                if (list.isEmpty() || list.get(0) instanceof MessageInfo) {
                     return ResponseEntity.ok((List<MessageInfo>) list);
                 }
             }
@@ -123,12 +123,12 @@ public class MessageController {
         if (session.getAttribute("uid") == null) {
             return ResponseEntity.badRequest().body(null);
         }
-        String uid = (String) session.getAttribute("uid");
+        Integer uid = (Integer) session.getAttribute("uid");
         ServiceResult result = messageService.getMessages(uid, did, beginTime, endTime);
         if (result.getSuccess()) {
             Object data = result.getData();
             if (data instanceof List<?> list) {
-                if (!list.isEmpty() && list.get(0) instanceof MessageInfo) {
+                if (list.isEmpty() || list.get(0) instanceof MessageInfo) {
                     return ResponseEntity.ok((List<MessageInfo>) list);
                 }
             }

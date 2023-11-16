@@ -1,7 +1,9 @@
 package bs.backend.service;
 
 import bs.backend.common.MessageCount;
+import bs.backend.mapper.MessageMapper;
 import bs.backend.model.MessageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,15 +11,22 @@ import java.util.List;
 @Service
 public class MessageService {
 
-    public ServiceResult getMessagesCount(String uid) {
+    private final MessageMapper messageMapper;
+
+    @Autowired
+    public MessageService(MessageMapper messageMapper) {
+        this.messageMapper = messageMapper;
+    }
+
+    public ServiceResult getMessagesCount(Integer uid) {
         return new ServiceResult(true, new MessageCount(2048, 1024, 512));
     }
 
-    public ServiceResult getMessagesCount(String uid, String beginTime, String endTime) {
+    public ServiceResult getMessagesCount(Integer uid, String beginTime, String endTime) {
         return new ServiceResult(true, new MessageCount(1024, 512, 256));
     }
 
-    public ServiceResult getMessages(String uid, String beginTime, String endTime) {
+    public ServiceResult getMessages(Integer uid, String beginTime, String endTime) {
         List<MessageInfo> messageInfoList = List.of(
                 new MessageInfo("001", "This is a normal message", "2021-01-01 00:00:00", "normal", "Beijing", "unread", "Device 1"),
                 new MessageInfo("002", "This is a warning message", "2021-01-01 00:00:00", "warning", "Beijing", "unread", "Device 1"),
@@ -30,7 +39,7 @@ public class MessageService {
         return new ServiceResult(true, messageInfoList);
     }
 
-    public ServiceResult getMessages(String uid, String did, String beginTime, String endTime) {
+    public ServiceResult getMessages(Integer uid, String did, String beginTime, String endTime) {
         List<MessageInfo> messageInfoList = List.of(
                 new MessageInfo("001", "This is a normal message", "2021-01-01 00:00:00", "normal", "119.150,30.160", "unread", "Device " + did),
                 new MessageInfo("002", "This is a warning message", "2021-01-01 00:05:00", "warning", "119.250,30.170", "unread", "Device " + did),
@@ -43,7 +52,7 @@ public class MessageService {
         return new ServiceResult(true, messageInfoList);
     }
 
-    public ServiceResult getDeviceLatestEach(String uid) {
+    public ServiceResult getDeviceLatestEach(Integer uid) {
         List<MessageInfo> messageInfoList = List.of(
                 new MessageInfo("001", "This is a normal message", "2021-01-01 00:00:00", "normal", "116.482086,39.990496", "unread", "Device 1"),
                 new MessageInfo("002", "This is a warning message", "2021-01-01 00:00:00", "warning", "116.482046,39.990496", "unread", "Device 2"),
@@ -60,7 +69,7 @@ public class MessageService {
         return new ServiceResult(true, messageInfoList);
     }
 
-    public ServiceResult getMostMessageDevices(String uid) {
+    public ServiceResult getMostMessageDevices(Integer uid) {
         List<MessageCount> messageCountList = List.of(
                 new MessageCount("Device 1", 1024),
                 new MessageCount("Device 2", 512),

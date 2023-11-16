@@ -1,6 +1,5 @@
 package bs.backend.service;
 
-import bs.backend.model.UserInfo;
 import bs.backend.mapper.UserMapper;
 import bs.backend.model.User;
 import org.apache.ibatis.exceptions.PersistenceException;
@@ -20,7 +19,7 @@ public class UserService {
     public ServiceResult validate(String username, String password) {
         User user = userMapper.getUserByUsername(username);
         if (user != null && user.getPassword().equals(password)) {
-            return new ServiceResult(true, user.getUid().toString());
+            return new ServiceResult(true, user.getUid());
         } else {
         return new ServiceResult(false, "Wrong username or password");
         }
@@ -59,27 +58,27 @@ public class UserService {
         }
     }
 
-    public ServiceResult delete(String uid, String password) {
-        User user = userMapper.getUserByUid(Integer.parseInt(uid));
+    public ServiceResult delete(Integer uid, String password) {
+        User user = userMapper.getUserByUid(uid);
         if (user != null && user.getPassword().equals(password)) {
-            userMapper.deleteUserByUid(Integer.parseInt(uid));
+            userMapper.deleteUserByUid(uid);
             return new ServiceResult(true);
         } else {
             return new ServiceResult(false, "Wrong password");
         }
     }
 
-    public ServiceResult getUserInfo(String uid) {
-        User user = userMapper.getUserByUid(Integer.parseInt(uid));
+    public ServiceResult getUserInfo(Integer uid) {
+        User user = userMapper.getUserByUid(uid);
         if (user != null) {
-            return new ServiceResult(true, new UserInfo(uid, user.getUsername(), user.getEmail()));
+            return new ServiceResult(true, new User(uid, user.getUsername(), user.getEmail()));
         } else {
             return new ServiceResult(false, "User not found");
         }
     }
 
-    public ServiceResult updateUsername(String uid, String username) {
-        User user = userMapper.getUserByUid(Integer.parseInt(uid));
+    public ServiceResult updateUsername(Integer uid, String username) {
+        User user = userMapper.getUserByUid(uid);
         if (user != null) {
             user.setUsername(username);
             userMapper.updateUser(user);
@@ -89,8 +88,8 @@ public class UserService {
         }
     }
 
-    public ServiceResult updatePassword(String uid, String oldPassword, String newPassword) {
-        User user = userMapper.getUserByUid(Integer.parseInt(uid));
+    public ServiceResult updatePassword(Integer uid, String oldPassword, String newPassword) {
+        User user = userMapper.getUserByUid(uid);
         if (user != null && user.getPassword().equals(oldPassword)) {
             user.setPassword(newPassword);
             userMapper.updateUser(user);
@@ -100,8 +99,8 @@ public class UserService {
         }
     }
 
-    public ServiceResult updateEmail(String uid, String email) {
-        User user = userMapper.getUserByUid(Integer.parseInt(uid));
+    public ServiceResult updateEmail(Integer uid, String email) {
+        User user = userMapper.getUserByUid(uid);
         if (user != null) {
             user.setEmail(email);
             userMapper.updateUser(user);

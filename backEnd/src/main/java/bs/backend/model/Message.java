@@ -12,6 +12,5 @@ public class Message {
     private Double lat;
     private Double lng;
     private Integer timestamp;
-    private Integer uid;
     private Integer did;
 }
