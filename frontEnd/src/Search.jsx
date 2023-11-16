@@ -6,6 +6,23 @@ import axios from "axios";
 
 const { RangePicker } = DatePicker;
 
+const dateFormatter = Intl.DateTimeFormat('zh', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: false,
+}).format;
+
+async function reGeoCode(lng, lat) {
+  const url = 'https://restapi.amap.com/v3/geocode/regeo?output=json&location='
+    + lng + ',' + lat + '&key=' + import.meta.env.VITE_AMAP_KEY + '&radius=1000&extensions=all';
+  const response = await axios.get(url);
+  return response.data.regeocode.formatted_address;
+}
+
 async function requestOptionDevices() {
   const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/device/list`, {
     withCredentials: true
@@ -30,14 +47,9 @@ const columns = [
     key: 'deviceName',
   },
   {
-    title: 'Device Type',
-    dataIndex: 'deviceType',
-    key: 'deviceType',
-  },
-  {
-    title: 'Device Status',
-    dataIndex: 'deviceStatus',
-    key: 'deviceStatus',
+    title: 'Message Type',
+    dataIndex: 'type',
+    key: 'type',
   },
   {
     title: 'Time',
@@ -48,6 +60,11 @@ const columns = [
     title: 'Location',
     dataIndex: 'location',
     key: 'location',
+  },
+  {
+    title: 'Device Status',
+    dataIndex: 'status',
+    key: 'status',
   }
 ];
 
@@ -118,16 +135,36 @@ export default function Searching() {
             description: 'Please try again',
           });
         } else {
-          setSearchResults(response.data.map((item) => {
-            return {
-              deviceID: values.did,
-              deviceName: item.deviceName,
-              deviceType: item.type,
-              deviceStatus: item.status,
-              time: item.time,
-              location: item.location
-            }
-          }))
+          const res = response.data.map((data) => (
+            reGeoCode(data.lng, data.lat).then((res) => ({
+              deviceID: String(values.did).padStart(8, '0'),
+              deviceName: data.deviceName,
+              type: data.type === 0 ? 'Normal' : data.type === 1 ? 'Warning' : 'Error',
+              status: data.status === 0 ? 'Normal' : data.status === 1 ? 'Warning' : 'Error',
+              time: dateFormatter(new Date(data.timestamp)),
+              location: res,
+              lng: data.lng,
+              lat: data.lat
+            })).catch((err) => ({
+              deviceID: String(values.did).padStart(8, '0'),
+              deviceName: data.deviceName,
+              type: data.type === 0 ? 'Normal' : data.type === 1 ? 'Warning' : 'Error',
+              status: data.status === 0 ? 'Normal' : data.status === 1 ? 'Warning' : 'Error',
+              time: dateFormatter(new Date(data.timestamp)),
+              location: `${data.lng},${data.lat}`,
+              lng: data.lng,
+              lat: data.lat
+            }))
+          ));
+          Promise.all(res).then((res) => {
+            setSearchResults(res);
+          }).catch((err) => {
+            console.log(err);
+            notification.error({
+              message: 'Search failed!',
+              description: err.message,
+            });
+          })
         }
         setSearching(false)
       })
@@ -206,7 +243,7 @@ export default function Searching() {
           }}
           path={
             searchResults.map((item) => {
-              return [+item.location.split(',')[0], +item.location.split(',')[1]]
+              return [item.lng, item.lat]
             })
           }
         />}
