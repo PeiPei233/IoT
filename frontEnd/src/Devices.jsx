@@ -1,11 +1,12 @@
-import { Flex, Card, Spin, Empty, Button, FloatButton, Form, Input, Modal, App, message, notification } from 'antd'
+import { Flex, Card, Spin, Empty, Button, FloatButton, Form, Input, Modal, App, List, Avatar, Row, Col, Typography } from 'antd'
 import { useState, useEffect, useRef } from 'react'
-import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
+import { PlusOutlined, ExclamationCircleOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 
 const { confirm } = Modal
 const { Search } = Input
+const { Text, Title } = Typography
 
 async function requestDevicesInfo() {
   try {
@@ -36,19 +37,24 @@ export default function Devices() {
   const [search, setSearch] = useState('')
   const [addForm] = Form.useForm()
   const [modifyForm] = Form.useForm()
+  const { notification, message } = App.useApp()
 
   useEffect(() => {
     setLoading(true)
     requestDevicesInfo().then((data) => {
       setDevices(data)
     })
-    .catch((error) => {
-      console.error(error)
-      setDevices([])
-    })
-    .finally(() => {
-      setLoading(false)
-    })
+      .catch((error) => {
+        console.error(error)
+        notification.error({
+          message: 'Get device list fail',
+          description: error,
+        })
+        setDevices([])
+      })
+      .finally(() => {
+        setLoading(false)
+      })
   }, [])
 
   function onSearch(value) {
@@ -77,13 +83,16 @@ export default function Devices() {
           'name': values.name,
           'type': values.type,
           'location': values.location,
-          'status': 'Online'
+          'status': values.status === 0 ? 'Normal' : values.status === 1 ? 'Warning' : 'Error'
         })
         addForm.resetFields()
       }).catch((error) => {
         console.error('Request Fail:', error)
         setComfirmLoading(false)
-        message.error('Add device fail')
+        notification.error({
+          message: 'Add device fail',
+          description: 'Please check your input and try again',
+        })
       })
     }).catch((info) => {
       console.log('Validate Failed:', info)
@@ -122,13 +131,17 @@ export default function Devices() {
         requestDevicesInfo(setLoading).then((data) => {
           setDevices(data)
         })
-        .catch((error) => {
-          console.error(error)
-          setDevices([])
-        })
-        .finally(() => {
-          setLoading(false)
-        })
+          .catch((error) => {
+            console.error(error)
+            notification.error({
+              message: 'Get device list fail',
+              description: error,
+            })
+            setDevices([])
+          })
+          .finally(() => {
+            setLoading(false)
+          })
       }).catch((error) => {
         console.error('Request Fail:', error)
         setComfirmLoading(false)
@@ -155,24 +168,38 @@ export default function Devices() {
             {devices.map((device) => (
               <Card
                 key={device.did}
-                title={device.name}
                 style={{ width: 300, margin: '1em' }}
                 hoverable
                 onClick={() => {
                   setShowModifyModal(true)
                   setModifyDevice(device)
                   modifyForm.setFieldsValue({
-                    did: device.did,
+                    did: String(device.did).padStart(8, '0'),
                     name: device.name,
                     type: device.type,
                     location: device.location,
                   })
                 }}
               >
-                <p><b>Device ID:</b> {device.did}</p>
-                <p><b>Type:</b> {device.type}</p>
-                <p><b>Location:</b> {device.location}</p>
-                <p><b>Status:</b> {device.status}</p>
+                <div style={{ position: 'absolute', top: 16, right: 16 }}>
+                  <Text type="secondary">{'Device ID: ' + String(device.did).padStart(8, '0')}</Text>
+                </div>
+                <Avatar size={64}
+                  style={{
+                    backgroundColor: device.status === 0 ? '#1f883d' :
+                      device.status === 1 ? '#fadb14' : '#f5222d',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  icon={
+                    device.status === 0 ? <CheckCircleOutlined /> :
+                      device.status === 1 ? <ExclamationCircleOutlined /> : <CloseCircleOutlined />
+                  } />
+                <div>
+                  <Title level={4} style={{ marginBottom: 0 }}>{device.name}</Title>
+                  <Text>{`${device.type} - ${device.location}`}</Text>
+                </div>
               </Card>
             ))}
           </Flex>}
@@ -244,19 +271,23 @@ export default function Devices() {
             requestDevicesInfo().then((data) => {
               setDevices(data)
             })
-            .catch((error) => {
-              console.error(error)
-              setDevices([])
-            })
-            .finally(() => {
-              setLoading(false)
-            })
+              .catch((error) => {
+                console.error(error)
+                notification.error({
+                  message: 'Get device list fail',
+                  description: error,
+                })
+                setDevices([])
+              })
+              .finally(() => {
+                setLoading(false)
+              })
           }}>
             Done
           </Button>
         ]}
       >
-        <p><b>Device ID:</b> {result.did}</p>
+        <p><b>Device ID:</b> {String(result.did).padStart(8, '0')}</p>
         <p><b>Device Name:</b> {result.name}</p>
         <p><b>Device Type:</b> {result.type}</p>
         <p><b>Device Location:</b> {result.location}</p>
@@ -299,13 +330,17 @@ export default function Devices() {
                       requestDevicesInfo(setLoading).then((data) => {
                         setDevices(data)
                       })
-                      .catch((error) => {
-                        console.error(error)
-                        setDevices([])
-                      })
-                      .finally(() => {
-                        setLoading(false)
-                      })
+                        .catch((error) => {
+                          console.error(error)
+                          notification.error({
+                            message: 'Get device list fail',
+                            description: error,
+                          })
+                          setDevices([])
+                        })
+                        .finally(() => {
+                          setLoading(false)
+                        })
                     }).catch((error) => {
                       console.error('Request Fail:', error)
                       setDeleteLoading(false)
