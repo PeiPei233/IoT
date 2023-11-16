@@ -8,6 +8,7 @@ export default function Map({ style, markers, path }) {
     }
 
     window._AMapSecurityConfig = {
+      securityJsCode: import.meta.env.VITE_AMAP_JS_SECURITY_CODE,
     };
 
     const script = document.createElement('script');
@@ -25,6 +26,7 @@ export default function Map({ style, markers, path }) {
 
   function initMap() {
     window.AMapLoader.load({
+      key: import.meta.env.VITE_AMAP_JS_KEY,
       version: "2.0",
     }).then((AMap) => {
       console.log(AMap);

@@ -185,6 +185,10 @@ function Login({ setState, setLoading }) {
       })
       .catch(error => {
         console.error('Request Fail:', error);
+        notification.error({
+          message: 'Login failed!',
+          description: 'Please check your username and password.',
+        });
       })
       .finally(() => {
         setLoading(false);

@@ -7,7 +7,7 @@ import axios from "axios";
 const { RangePicker } = DatePicker;
 
 async function requestOptionDevices() {
-  const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/device/basicList`, {
+  const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/device/list`, {
     withCredentials: true
   });
   return res.data.map((item) => {

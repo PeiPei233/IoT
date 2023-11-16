@@ -2,10 +2,27 @@ import { useState, useEffect } from "react"
 import { Card, Row, Col, Statistic, Carousel, Table, List, FloatButton, App, notification } from "antd"
 import { PieChart, Pie, Sector, ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar } from 'recharts';
 import { CheckCircleOutlined, ExclamationCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import { IconLocation } from '@arco-design/web-react/icon';
+import { IconLocation, IconClockCircle } from '@arco-design/web-react/icon';
 import { useNavigate } from "react-router-dom";
 import Map from "./Map"
 import axios from "axios";
+
+const dateFormatter = Intl.DateTimeFormat('zh', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: false,
+}).format;
+
+async function reGeoCode(lng, lat) {
+  const url = 'https://restapi.amap.com/v3/geocode/regeo?output=json&location='
+    + lng + ',' + lat + '&key=' + import.meta.env.VITE_AMAP_KEY + '&radius=1000&extensions=all';
+  const response = await axios.get(url);
+  return response.data.regeocode.formatted_address;
+}
 
 async function requestDevicesData() {
   const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/device/briefInfo`, {
@@ -37,13 +54,22 @@ async function requestLatestMessagesData() {
   const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/message/latest`, {
     withCredentials: true
   });
-  return response.data.map((data) => ({
-    device: data.deviceName,
-    messageType: data.type,
-    message: data.message,
-    time: data.time,
-    location: data.location
-  }));
+  const res = response.data.map((data) => (
+    reGeoCode(data.lng, data.lat).then((res) => ({
+      device: data.deviceName,
+      messageType: data.type === 0 ? 'Normal' : data.type === 1 ? 'Warning' : 'Error', // 0: 'Normal', 1: 'Warning', 2: 'Error
+      message: data.message,
+      time: dateFormatter(new Date(data.timestamp)),
+      location: res
+    })).catch((err) => ({
+      device: data.deviceName,
+      messageType: data.type === 0 ? 'Normal' : data.type === 1 ? 'Warning' : 'Error', // 0: 'Normal', 1: 'Warning', 2: 'Error
+      message: data.message,
+      time: dateFormatter(new Date(data.timestamp)),
+      location: `${data.lng},${data.lat}`
+    }))
+  ));
+  return Promise.all(res);
 }
 
 const latestMessagesColumns = [
@@ -88,12 +114,24 @@ async function requestLatestDevicesStatusData() {
   const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/message/latestDevice`, {
     withCredentials: true
   });
-  return response.data.map((data) => ({
-    device: data.deviceName,
-    status: data.type,
-    time: data.time,
-    location: data.location
-  }));
+  const res = response.data.map((data) => (
+    reGeoCode(data.lng, data.lat).then((res) => ({
+      device: data.deviceName,
+      status: data.status === 0 ? 'Normal' : data.status === 1 ? 'Warning' : 'Error', // 0: 'Normal', 1: 'Warning', 2: 'Error
+      time: dateFormatter(new Date(data.timestamp)),
+      location: res,
+      lat: data.lat,
+      lng: data.lng
+    })).catch((err) => ({
+      device: data.deviceName,
+      status: data.status === 0 ? 'Normal' : data.status === 1 ? 'Warning' : 'Error', // 0: 'Normal', 1: 'Warning', 2: 'Error
+      time: dateFormatter(new Date(data.timestamp)),
+      location: `${data.lng},${data.lat}`,
+      lat: data.lat,
+      lng: data.lng
+    }))
+  ));
+  return Promise.all(res);
 }
 
 const renderActiveShape = (props) => {
@@ -199,7 +237,7 @@ export default function Home() {
         description: err.message,
       });
     })
-    
+
     requestLatestMessagesData().then((res) => {
       setLatestMessagesData(res);
       setLoadingLatestMessagesData(false);
@@ -210,7 +248,7 @@ export default function Home() {
         description: err.message,
       });
     })
-    
+
     requestMostDevicesMessagesData().then((res) => {
       setMostDevicesMessagesData(res);
       setLoadingMostDevicesMessagesData(false);
@@ -221,15 +259,15 @@ export default function Home() {
         description: err.message,
       });
     })
-    
+
     requestLatestDevicesStatusData().then((res) => {
       setLatestDevicesStatusData(res);
-      const groupNumber = 7;
+      const groupNumber = 5;
       setGroupLatestDevicesStatusData(Array.from({ length: Math.ceil(res.length / groupNumber) }, (_, index) => (
         res.slice(index * groupNumber, index * groupNumber + groupNumber)
       )))
       setLoadingLatestDevicesStatusData(false);
-      console.log(groupLatestDevicesStatusData)
+      // console.log(groupLatestDevicesStatusData)
     }).catch((err) => {
       console.log(err);
       notification.error({
@@ -237,7 +275,7 @@ export default function Home() {
         description: err.message,
       });
     })
-    
+
 
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -432,7 +470,7 @@ export default function Home() {
                     }}
                     markers={latestDevicesStatusData.map((data) => (
                       {
-                        position: [+data.location.split(',')[0], +data.location.split(',')[1]],
+                        position: [data.lng, data.lat],
                         title: data.device,
                       }
                     ))}
@@ -442,7 +480,8 @@ export default function Home() {
                 <h3>Latest Devices Status</h3>
                 {!loadingLatestDevicesStatusData && groupLatestDevicesStatusData.length !== 0 &&
                   <Carousel autoplay>
-                    {console.log(groupLatestDevicesStatusData)}{
+                    {/* {console.log(groupLatestDevicesStatusData)} */}
+                    {
                       groupLatestDevicesStatusData.map((data, index) => (
                         <div key={index}>
                           <List
@@ -457,9 +496,13 @@ export default function Home() {
                                         <CloseCircleOutlined style={{ fontSize: 24, color: '#c50f1f' }} />
                                   }
                                   title={item.device}
-                                  description={item.time}
+                                  description={
+                                    <div>
+                                      <div><IconClockCircle height={12}/>{item.time}</div>
+                                      <div><IconLocation height={12}/>{item.location}</div>
+                                    </div>
+                                  }
                                 />
-                                <div><IconLocation height={12} /> {item.location} </div>
                               </List.Item>
                             )}
                           />
