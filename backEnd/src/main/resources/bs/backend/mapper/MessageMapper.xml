@@ -1,4 +1,90 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="bs.backend.mapper.MessageMapper">
 
+    <insert id="insertMessage" parameterType="bs.backend.model.Message">
+        INSERT INTO message (type, status, value, info, lng, lat, timestamp, did)
+        VALUES (#{type}, #{status}, #{value}, #{info}, #{lng}, #{lat}, #{timestamp}, #{did})
+    </insert>
+
+    <select id="getMessageStatusCount" resultType="Integer">
+        SELECT COUNT(*)
+        FROM message m
+        JOIN device d on d.did = m.did
+        WHERE d.uid = #{uid}
+          AND m.status = #{status}
+    </select>
+
+    <select id="getMessageStatusCountByTime" resultType="Integer">
+        SELECT COUNT(*)
+        FROM message m
+        JOIN device d on d.did = m.did
+        WHERE d.uid = #{uid}
+          AND m.status = #{status}
+          AND m.timestamp BETWEEN #{beginTime} AND ${endTime}
+    </select>
+
+    <select id="getMessages" resultType="bs.backend.model.MessageInfo">
+        <![CDATA[
+        SELECT m.info as message, m.timestamp, m.type, m.lng, m.lat, m.status, m.value, d.name as deviceName
+        FROM message m
+        JOIN device d on d.did = m.did
+        WHERE d.uid = #{uid}
+            AND (#{beginTime} IS NULL OR m.timestamp >= #{beginTime})
+          AND (#{endTime} IS NULL OR m.timestamp <= #{endTime})
+        LIMIT 100
+        ]]>
+    </select>
+
+    <select id="getMessagesByDid" resultType="bs.backend.model.MessageInfo">
+        <![CDATA[
+        SELECT m.info as message, m.timestamp, m.type, m.lng, m.lat, m.status, m.value, d.name as deviceName
+        FROM message m
+                 JOIN device d on d.did = m.did
+        WHERE d.uid = #{uid}
+          AND d.did = #{did}
+          AND (#{beginTime} IS NULL OR m.timestamp >= #{beginTime})
+          AND (#{endTime} IS NULL OR m.timestamp <= #{endTime})
+        ORDER BY m.timestamp DESC
+        ]]>
+    </select>
+
+    <select id="getDeviceLatestEach" resultType="bs.backend.model.MessageInfo">
+        SELECT m.info as message, m.timestamp, m.type, m.lng, m.lat, m.status, m.value, d.name as deviceName
+        FROM
+            message m
+                INNER JOIN
+            (SELECT
+                 did, MAX(timestamp) as maxTimestamp
+             FROM
+                 message
+             GROUP BY
+                 did) as latestMessage ON m.did = latestMessage.did AND m.timestamp = latestMessage.maxTimestamp
+                INNER JOIN
+            device d ON m.did = d.did
+        WHERE
+            d.uid = #{uid}
+    </select>
+
+    <resultMap id="messageCountResultMap" type="bs.backend.model.MessageCount">
+        <result property="deviceName" column="device_name"/>
+        <result property="total" column="message_count"/>
+    </resultMap>
+
+    <select id="getMostMessageDevices" resultMap="messageCountResultMap">
+        SELECT
+            d.name as device_name,
+            COUNT(m.mid) as message_count
+        FROM
+            device d
+                LEFT JOIN
+            message m ON d.did = m.did
+        WHERE
+            d.uid = #{uid}
+        GROUP BY
+            d.did
+        ORDER BY
+            message_count DESC
+        LIMIT 10
+    </select>
+
 </mapper>
