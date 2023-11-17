@@ -22,7 +22,7 @@ function Register({ setState, setLoading }) {
       .then(response => {
         if (response.data === 'success') {
           message.success('Register successfully!');
-          navigate('/');
+          setState(false);
         } else {
           message.error('Register failed!');
         }
