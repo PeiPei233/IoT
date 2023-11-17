@@ -1,11 +1,12 @@
 package bs.backend.controller;
 
-import bs.backend.common.MessageCount;
+import bs.backend.model.MessageCount;
 import bs.backend.model.MessageInfo;
 import bs.backend.service.MessageService;
 import bs.backend.service.ServiceResult;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -119,7 +120,7 @@ public class MessageController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<MessageInfo>> getMessages(@RequestParam String did, @RequestParam(defaultValue = "") String beginTime, @RequestParam(defaultValue = "") String endTime, HttpSession session) {
+    public ResponseEntity<List<MessageInfo>> getMessages(@RequestParam Integer did, @RequestParam(defaultValue = "") String beginTime, @RequestParam(defaultValue = "") String endTime, HttpSession session) {
         if (session.getAttribute("uid") == null) {
             return ResponseEntity.badRequest().body(null);
         }
