@@ -8,11 +8,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MessageInfo {
-    private String mid;
     private String message;
-    private String time;
-    private String type;
-    private String location;
-    private String status;
+    private Long timestamp;
+    private Integer type;
+    private Double lng;
+    private Double lat;
+    private Integer status;
+    private Integer value;
     private String deviceName;
 }
