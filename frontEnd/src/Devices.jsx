@@ -23,7 +23,7 @@ async function requestDevicesInfo() {
   }
 }
 
-export default function Devices() {
+export default function Devices({ setShowDocModal }) {
 
   const [loading, setLoading] = useState(true)
   const [devices, setDevices] = useState([])
@@ -212,6 +212,10 @@ export default function Devices() {
           tooltip='Add a new device'
           onClick={openModal}
         />
+        <FloatButton 
+          tooltip='Document'
+          onClick={() => setShowDocModal(true)}
+        />
         <FloatButton.BackTop visibilityHeight={0} />
       </FloatButton.Group>
       <Modal
@@ -293,7 +297,7 @@ export default function Devices() {
         <p><b>Device Location:</b> {result.location}</p>
         <p>
           Use the Device ID to connect your device to the server.
-          See the <a href='' target='_blank'>documentation</a> for more information.
+          See the <Link onClick={() => setShowDocModal(true)}>documentation</Link> for more information.
         </p>
       </Modal>
       <Modal

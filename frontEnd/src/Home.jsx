@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react"
-import { Card, Row, Col, Statistic, Carousel, Table, List, FloatButton, App, notification } from "antd"
+import { Card, Row, Col, Statistic, Carousel, Table, List, FloatButton, App, notification, Alert, Empty, Button } from "antd"
 import { PieChart, Pie, Sector, ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar } from 'recharts';
 import { CheckCircleOutlined, ExclamationCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { IconLocation, IconClockCircle } from '@arco-design/web-react/icon';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Map from "./Map"
 import axios from "axios";
 
@@ -176,7 +176,7 @@ const renderActiveShape = (props) => {
   );
 };
 
-export default function Home() {
+export default function Home({ setCurrent, setShowDocModal }) {
 
   const navigate = useNavigate();
   const { message, modal, notification } = App.useApp();
@@ -302,7 +302,7 @@ export default function Home() {
               suffix={`/ ${devicesData.total}`}
               loading={loadingDevicesData}
             />
-            {!loadingDevicesData &&
+            {!loadingDevicesData && devicesData.total !== 0 &&
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -329,6 +329,14 @@ export default function Home() {
                   />
                 </PieChart>
               </ResponsiveContainer>}
+            {!loadingDevicesData && devicesData.total === 0 &&
+              <div style={{ height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <Empty
+                  description='No device found'
+                >
+                  <Button type="primary" onClick={() => setCurrent('devices')}>Add a device</Button>
+                </Empty>
+              </div>}
           </Card>
         </Col>
         <Col xs={24} md={16}>
@@ -387,7 +395,7 @@ export default function Home() {
                 </Row>
               </Col>
               <Col xs={24} md={14} lg={17}>
-                {!loadingMessagesDailyData &&
+                {!loadingMessagesData && messagesData.total !== 0 && !loadingMessagesDailyData &&
                   <ResponsiveContainer width="100%" height={300}>
                     <AreaChart
                       data={messagesDailyData}
@@ -407,116 +415,132 @@ export default function Home() {
                       <Area type="monotone" dataKey="Error" stackId="1" stroke="#c50f1f" fill="#c50f1f" />
                     </AreaChart>
                   </ResponsiveContainer>}
-              </Col>
-            </Row>
-          </Card>
-        </Col>
-      </Row>
-      <Row gutter={[36, 36]} style={{ marginBottom: 36 }}>
-        <Col xs={24}>
-          <Card>
-            <Row gutter={[36, 36]}>
-              <Col xs={24} md={16}>
-                <h3>Latest Messages</h3>
-                <Table
-                  dataSource={latestMessagesData}
-                  columns={latestMessagesColumns}
-                  pagination={false}
-                  scroll={{ y: 240, x: 700 }}
-                  loading={loadingLatestMessagesData}
-                />
-              </Col>
-              <Col xs={24} md={8}>
-                <h3>Most Messages Devices Today</h3>
-                {!loadingMostDevicesMessagesData &&
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart
-                      data={mostDevicesMessagesData}
-                      margin={{
-                        top: 20,
-                        right: 0,
-                        left: 0,
-                        bottom: 20,
-                      }}
-                      layout="vertical"
-                      barSize={20}
+                {!loadingMessagesData && messagesData.total === 0 &&
+                  <div style={{ height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Empty
+                      description='No message found'
                     >
-                      <YAxis dataKey="device" type="category" scale="band" axisLine={false}
-                        tickLine={false} />
-                      <XAxis type="number" hide />
-                      <Tooltip />
-                      <Bar dataKey="num" fill="#1f883d" />
-                    </BarChart>
-                  </ResponsiveContainer>}
+                      <Button type="primary" onClick={() => setShowDocModal(true)}>See how to send messages</Button>
+                    </Empty>
+                  </div>}
               </Col>
             </Row>
           </Card>
         </Col>
       </Row>
-      <Row gutter={[36, 36]} style={{ marginBottom: 36 }}>
-        <Col xs={24}>
-          <Card loading={loadingLatestDevicesStatusData}>
-            <Row gutter={[36, 36]}>
-              <Col md={24} lg={16}>
-                <h3>Latest Devices Location</h3>
-                {!loadingLatestDevicesStatusData &&
-                  <Map
-                    style={{
-                      height: windowWidth < 768 ? windowWidth - 147 : 500,
-                      width: windowWidth < 768 ? windowWidth - 147 : '100%',
-                      borderRadius: 8,
-                      overflow: 'hidden',
-                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                    }}
-                    markers={latestDevicesStatusData.map((data) => (
-                      {
-                        position: [data.lng, data.lat],
-                        title: data.device,
-                      }
-                    ))}
-                  />}
-              </Col>
-              <Col md={24} lg={8}>
-                <h3>Latest Devices Status</h3>
-                {!loadingLatestDevicesStatusData && groupLatestDevicesStatusData.length !== 0 &&
-                  <Carousel autoplay style={{
-                    width: windowWidth < 768 ? windowWidth - 147 : '100%',
-                  }}>
-                    {/* {console.log(groupLatestDevicesStatusData)} */}
-                    {
-                      groupLatestDevicesStatusData.map((data, index) => (
-                        <div key={index}>
-                          <List
-                            itemLayout="horizontal"
-                            dataSource={data}
-                            renderItem={item => (
-                              <List.Item>
-                                <List.Item.Meta
-                                  avatar={
-                                    item.status.toLowerCase() === 'normal' ? <CheckCircleOutlined style={{ fontSize: 24, color: '#1f883d' }} /> :
-                                      item.status.toLowerCase() === 'warning' ? <ExclamationCircleOutlined style={{ fontSize: 24, color: '#f5b50a' }} /> :
-                                        <CloseCircleOutlined style={{ fontSize: 24, color: '#c50f1f' }} />
-                                  }
-                                  title={item.device}
-                                  description={
-                                    <div>
-                                      <div><IconClockCircle height={12}/>{item.time}</div>
-                                      <div><IconLocation height={12}/>{item.location}</div>
-                                    </div>
-                                  }
-                                />
-                              </List.Item>
-                            )}
-                          />
-                        </div>
+      {!loadingMessagesData && messagesData.total !== 0 &&
+        <Row gutter={[36, 36]} style={{ marginBottom: 36 }}>
+          <Col xs={24}>
+            <Card>
+              <Row gutter={[36, 36]}>
+                <Col xs={24} md={16}>
+                  <h3>Latest Messages</h3>
+                  <Table
+                    dataSource={latestMessagesData}
+                    columns={latestMessagesColumns}
+                    pagination={false}
+                    scroll={{ y: 240, x: 700 }}
+                    loading={loadingLatestMessagesData}
+                  />
+                </Col>
+                <Col xs={24} md={8}>
+                  <h3>Most Messages Devices</h3>
+                  {!loadingMostDevicesMessagesData &&
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart
+                        data={mostDevicesMessagesData}
+                        margin={{
+                          top: 20,
+                          right: 0,
+                          left: 0,
+                          bottom: 20,
+                        }}
+                        layout="vertical"
+                        barSize={20}
+                      >
+                        <YAxis dataKey="device" type="category" scale="band" axisLine={false}
+                          tickLine={false} />
+                        <XAxis type="number" hide />
+                        <Tooltip />
+                        <Bar dataKey="num" fill="#1f883d" />
+                      </BarChart>
+                    </ResponsiveContainer>}\
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+        </Row>}
+      {!loadingMessagesData && messagesData.total !== 0 &&
+        <Row gutter={[36, 36]} style={{ marginBottom: 36 }}>
+          <Col xs={24}>
+            <Card loading={loadingLatestDevicesStatusData}>
+              <Row gutter={[36, 36]}>
+                <Col md={24} lg={16}>
+                  <h3>Latest Devices Location</h3>
+                  {!loadingLatestDevicesStatusData &&
+                    <Map
+                      style={{
+                        height: windowWidth < 768 ? windowWidth - 147 : 500,
+                        width: windowWidth < 768 ? windowWidth - 147 : '100%',
+                        borderRadius: 8,
+                        overflow: 'hidden',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                      }}
+                      markers={latestDevicesStatusData.map((data) => (
+                        {
+                          position: [data.lng, data.lat],
+                          title: data.device,
+                        }
                       ))}
-                  </Carousel>}
-              </Col>
-            </Row>
-          </Card>
-        </Col>
-      </Row>
-      <FloatButton.BackTop visibilityHeight={0} />
+                    />}
+                </Col>
+                <Col md={24} lg={8}>
+                  <h3>Latest Devices Status</h3>
+                  {!loadingLatestDevicesStatusData && groupLatestDevicesStatusData.length !== 0 &&
+                    <Carousel autoplay style={{
+                      width: windowWidth < 768 ? windowWidth - 147 : '100%',
+                    }}>
+                      {/* {console.log(groupLatestDevicesStatusData)} */}
+                      {
+                        groupLatestDevicesStatusData.map((data, index) => (
+                          <div key={index}>
+                            <List
+                              itemLayout="horizontal"
+                              dataSource={data}
+                              renderItem={item => (
+                                <List.Item>
+                                  <List.Item.Meta
+                                    avatar={
+                                      item.status.toLowerCase() === 'normal' ? <CheckCircleOutlined style={{ fontSize: 24, color: '#1f883d' }} /> :
+                                        item.status.toLowerCase() === 'warning' ? <ExclamationCircleOutlined style={{ fontSize: 24, color: '#f5b50a' }} /> :
+                                          <CloseCircleOutlined style={{ fontSize: 24, color: '#c50f1f' }} />
+                                    }
+                                    title={item.device}
+                                    description={
+                                      <div>
+                                        <div><IconClockCircle height={12} />{item.time}</div>
+                                        <div><IconLocation height={12} />{item.location}</div>
+                                      </div>
+                                    }
+                                  />
+                                </List.Item>
+                              )}
+                            />
+                          </div>
+                        ))}
+                    </Carousel>}
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+        </Row>}
+      <FloatButton.Group>
+        <FloatButton 
+          tooltip="Document"
+          onClick={() => setShowDocModal(true)}
+        />
+        <FloatButton.BackTop visibilityHeight={0} />
+      </FloatButton.Group>
     </div>
   )
 }
