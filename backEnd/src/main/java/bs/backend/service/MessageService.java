@@ -1,8 +1,9 @@
 package bs.backend.service;
 
-import bs.backend.common.MessageCount;
+import bs.backend.model.MessageCount;
 import bs.backend.mapper.MessageMapper;
 import bs.backend.model.MessageInfo;
+import bs.backend.utils.time.TimestampRange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,73 +20,65 @@ public class MessageService {
     }
 
     public ServiceResult getMessagesCount(Integer uid) {
-        return new ServiceResult(true, new MessageCount(2048, 1024, 512));
+        try {
+            Integer normalCount = messageMapper.getMessageStatusCount(uid, 0);
+            Integer warningCount = messageMapper.getMessageStatusCount(uid, 1);
+            Integer dangerCount = messageMapper.getMessageStatusCount(uid, 2);
+            return new ServiceResult(true, new MessageCount(normalCount, warningCount, dangerCount));
+        } catch (Exception e) {
+            return new ServiceResult(false, e.getMessage());
+        }
     }
 
     public ServiceResult getMessagesCount(Integer uid, String beginTime, String endTime) {
-        return new ServiceResult(true, new MessageCount(1024, 512, 256));
+        try {
+            TimestampRange timestampRange = new TimestampRange(beginTime, endTime);
+            Integer normalCount = messageMapper.getMessageStatusCountByTime(uid, 0, timestampRange.getBeginTimestamp(), timestampRange.getEndTimestamp());
+            Integer warningCount = messageMapper.getMessageStatusCountByTime(uid, 1, timestampRange.getBeginTimestamp(), timestampRange.getEndTimestamp());
+            Integer dangerCount = messageMapper.getMessageStatusCountByTime(uid, 2, timestampRange.getBeginTimestamp(), timestampRange.getEndTimestamp());
+            return new ServiceResult(true, new MessageCount(normalCount, warningCount, dangerCount));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ServiceResult(false, e.getMessage());
+        }
     }
 
     public ServiceResult getMessages(Integer uid, String beginTime, String endTime) {
-        List<MessageInfo> messageInfoList = List.of(
-                new MessageInfo("This is a normal message", 1609459200000L, 0, 119.903524, 30.156036, 0, "Device 1"),
-                new MessageInfo("This is a warning message", 1609459200000L, 1, 119.903524, 30.156036, 0, "Device 1"),
-                new MessageInfo("This is a danger message", 1609459200000L, 2, 119.903524, 30.156036, 0, "Device 1"),
-                new MessageInfo("This is a normal message", 1609459200000L, 0, 119.903524, 30.156036, 0, "Device 2"),
-                new MessageInfo("This is a warning message", 1609459200000L, 1, 119.903524, 30.156036, 0, "Device 2"),
-                new MessageInfo("This is a danger message", 1609459200000L, 2, 119.903524, 30.156036, 0, "Device 2"),
-                new MessageInfo("This is a normal message", 1609459200000L, 0, 119.903524, 30.156036, 0, "Device 3"),
-                new MessageInfo("This is a warning message", 1609459200000L, 1, 119.903524, 30.156036, 0, "Device 3"),
-                new MessageInfo("This is a danger message", 1609459200000L, 2, 119.903524, 30.156036, 0, "Device 3"),
-                new MessageInfo("This is a normal message", 1609459200000L, 0, 119.903524, 30.156036, 0, "Device 4"),
-                new MessageInfo("This is a warning message", 1609459200000L, 1, 119.903524, 30.156036, 0, "Device 4"),
-                new MessageInfo("This is a danger message", 1609459200000L, 2, 119.903524, 30.156036, 0, "Device 4"),
-                new MessageInfo("This is a normal message", 1609459200000L, 0, 119.903524, 30.156036, 0, "Device 5"),
-                new MessageInfo("This is a warning message", 1609459200000L, 1, 119.903524, 30.156036, 0, "Device 5")
-        );
-        return new ServiceResult(true, messageInfoList);
+        try {
+            TimestampRange timestampRange = new TimestampRange(beginTime, endTime);
+            List<MessageInfo> messageInfoList = messageMapper.getMessages(uid, timestampRange.getBeginTimestamp(), timestampRange.getEndTimestamp());
+            return new ServiceResult(true, messageInfoList);
+        } catch (Exception e) {
+            return new ServiceResult(false, e.getMessage());
+        }
     }
 
-    public ServiceResult getMessages(Integer uid, String did, String beginTime, String endTime) {
-        List<MessageInfo> messageInfoList = List.of(
-                new MessageInfo("This is a normal message", 1609459200000L, 0, 119.903524, 30.156036, 0, "Device " + did),
-                new MessageInfo("This is a warning message", 1609459200000L, 1, 119.903524, 30.156036, 0, "Device " + did),
-                new MessageInfo("This is a danger message", 1609459200000L, 2, 119.903524, 30.156036, 0, "Device " + did),
-                new MessageInfo("This is a normal message", 1609459200000L, 0, 119.903524, 30.156036, 0, "Device " + did),
-                new MessageInfo("This is a warning message", 1609459200000L, 1, 119.903524, 30.156036, 0, "Device " + did),
-                new MessageInfo("This is a danger message", 1609459200000L, 2, 119.903524, 30.156036, 0, "Device " + did),
-                new MessageInfo("This is a normal message", 1609459200000L, 0, 119.903524, 30.156036, 0, "Device " + did),
-                new MessageInfo("This is a warning message", 1609459200000L, 1, 119.903524, 30.156036, 0, "Device " + did)
-        );
-        return new ServiceResult(true, messageInfoList);
+    public ServiceResult getMessages(Integer uid, Integer did, String beginTime, String endTime) {
+        try {
+            TimestampRange timestampRange = new TimestampRange(beginTime, endTime);
+            List<MessageInfo> messageInfoList = messageMapper.getMessagesByDid(uid, did, timestampRange.getBeginTimestamp(), timestampRange.getEndTimestamp());
+            return new ServiceResult(true, messageInfoList);
+        } catch (Exception e) {
+            return new ServiceResult(false, e.getMessage());
+        }
     }
 
     public ServiceResult getDeviceLatestEach(Integer uid) {
-        List<MessageInfo> messageInfoList = List.of(
-                new MessageInfo("This is a normal message", 1609459200000L, 0, 119.903524, 30.156036, 0, "Device 1"),
-                new MessageInfo("This is a warning message", 1609459200000L, 1, 119.903524, 30.156036, 0, "Device 2"),
-                new MessageInfo("This is a danger message", 1609459200000L, 2, 119.903524, 30.156036, 0, "Device 3"),
-                new MessageInfo("This is a normal message", 1609459200000L, 0, 119.903524, 30.156036, 0, "Device 4"),
-                new MessageInfo("This is a warning message", 1609459200000L, 1, 119.903524, 30.156036, 0, "Device 5")
-        );
-        return new ServiceResult(true, messageInfoList);
+        try {
+            List<MessageInfo> messageInfoList = messageMapper.getDeviceLatestEach(uid);
+            return new ServiceResult(true, messageInfoList);
+        } catch (Exception e) {
+            return new ServiceResult(false, e.getMessage());
+        }
     }
 
     public ServiceResult getMostMessageDevices(Integer uid) {
-        List<MessageCount> messageCountList = List.of(
-                new MessageCount("Device 1", 1024),
-                new MessageCount("Device 2", 512),
-                new MessageCount("Device 3", 256),
-                new MessageCount("Device 4", 128),
-                new MessageCount("Device 5", 64),
-                new MessageCount("Device 6", 32),
-                new MessageCount("Device 7", 16),
-                new MessageCount("Device 8", 8),
-                new MessageCount("Device 9", 4),
-                new MessageCount("Device 10", 2),
-                new MessageCount("Device 11", 1)
-        );
-        return new ServiceResult(true, messageCountList);
+        try {
+            List<MessageCount> messageCountList = messageMapper.getMostMessageDevices(uid);
+            return new ServiceResult(true, messageCountList);
+        } catch (Exception e) {
+            return new ServiceResult(false, e.getMessage());
+        }
     }
 
 }
