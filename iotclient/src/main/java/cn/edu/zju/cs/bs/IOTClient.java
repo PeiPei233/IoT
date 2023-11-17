@@ -13,7 +13,7 @@ public class IOTClient {
 
         try {
             Properties properties = new Properties();
-            FileInputStream in = new FileInputStream("iot.properties");
+            FileInputStream in = new FileInputStream("src/main/resources/iot.properties");
             properties.load(in);
             devices = Integer.parseInt(properties.getProperty("devices"));
             mqttServer = properties.getProperty("server");
