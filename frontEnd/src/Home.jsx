@@ -422,7 +422,7 @@ export default function Home() {
                   dataSource={latestMessagesData}
                   columns={latestMessagesColumns}
                   pagination={false}
-                  scroll={{ y: 240, x: true }}
+                  scroll={{ y: 240, x: 700 }}
                   loading={loadingLatestMessagesData}
                 />
               </Col>
@@ -462,8 +462,8 @@ export default function Home() {
                 {!loadingLatestDevicesStatusData &&
                   <Map
                     style={{
-                      height: windowWidth < 768 ? windowWidth - 166 : 500,
-                      width: windowWidth < 768 ? windowWidth - 166 : '100%',
+                      height: windowWidth < 768 ? windowWidth - 147 : 500,
+                      width: windowWidth < 768 ? windowWidth - 147 : '100%',
                       borderRadius: 8,
                       overflow: 'hidden',
                       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
@@ -479,7 +479,9 @@ export default function Home() {
               <Col md={24} lg={8}>
                 <h3>Latest Devices Status</h3>
                 {!loadingLatestDevicesStatusData && groupLatestDevicesStatusData.length !== 0 &&
-                  <Carousel autoplay>
+                  <Carousel autoplay style={{
+                    width: windowWidth < 768 ? windowWidth - 147 : '100%',
+                  }}>
                     {/* {console.log(groupLatestDevicesStatusData)} */}
                     {
                       groupLatestDevicesStatusData.map((data, index) => (
