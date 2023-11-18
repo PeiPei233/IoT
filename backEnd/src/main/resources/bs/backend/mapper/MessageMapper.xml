@@ -6,20 +6,20 @@
         VALUES (#{type}, #{status}, #{value}, #{info}, #{lng}, #{lat}, #{timestamp}, #{did})
     </insert>
 
-    <select id="getMessageStatusCount" resultType="Integer">
+    <select id="getMessageTypeCount" resultType="Integer">
         SELECT COUNT(*)
         FROM message m
         JOIN device d on d.did = m.did
         WHERE d.uid = #{uid}
-          AND m.status = #{status}
+          AND m.type = #{type}
     </select>
 
-    <select id="getMessageStatusCountByTime" resultType="Integer">
+    <select id="getMessageTypeCountByTime" resultType="Integer">
         SELECT COUNT(*)
         FROM message m
         JOIN device d on d.did = m.did
         WHERE d.uid = #{uid}
-          AND m.status = #{status}
+          AND m.type = #{type}
           AND m.timestamp BETWEEN #{beginTime} AND ${endTime}
     </select>
 
@@ -31,7 +31,8 @@
         WHERE d.uid = #{uid}
             AND (#{beginTime} IS NULL OR m.timestamp >= #{beginTime})
           AND (#{endTime} IS NULL OR m.timestamp <= #{endTime})
-        LIMIT 100
+        ORDER BY m.timestamp DESC
+        LIMIT 50
         ]]>
     </select>
 

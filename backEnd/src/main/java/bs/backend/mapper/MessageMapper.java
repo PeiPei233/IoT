@@ -11,8 +11,8 @@ import java.util.List;
 public interface MessageMapper {
 
     void insertMessage(Message message);
-    Integer getMessageStatusCount(Integer uid, Integer status);
-    Integer getMessageStatusCountByTime(Integer uid, Integer status, Long beginTime, Long endTime);
+    Integer getMessageTypeCount(Integer uid, Integer type);
+    Integer getMessageTypeCountByTime(Integer uid, Integer type, Long beginTime, Long endTime);
     List<MessageInfo> getMessages(Integer uid, Long beginTime, Long endTime);
     List<MessageInfo> getMessagesByDid(Integer uid, Integer did, Long beginTime, Long endTime);
     List<MessageInfo> getDeviceLatestEach(Integer uid);

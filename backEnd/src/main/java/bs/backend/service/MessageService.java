@@ -21,9 +21,9 @@ public class MessageService {
 
     public ServiceResult getMessagesCount(Integer uid) {
         try {
-            Integer normalCount = messageMapper.getMessageStatusCount(uid, 0);
-            Integer warningCount = messageMapper.getMessageStatusCount(uid, 1);
-            Integer dangerCount = messageMapper.getMessageStatusCount(uid, 2);
+            Integer normalCount = messageMapper.getMessageTypeCount(uid, 0);
+            Integer warningCount = messageMapper.getMessageTypeCount(uid, 1);
+            Integer dangerCount = messageMapper.getMessageTypeCount(uid, 2);
             return new ServiceResult(true, new MessageCount(normalCount, warningCount, dangerCount));
         } catch (Exception e) {
             return new ServiceResult(false, e.getMessage());
@@ -33,9 +33,9 @@ public class MessageService {
     public ServiceResult getMessagesCount(Integer uid, String beginTime, String endTime) {
         try {
             TimestampRange timestampRange = new TimestampRange(beginTime, endTime);
-            Integer normalCount = messageMapper.getMessageStatusCountByTime(uid, 0, timestampRange.getBeginTimestamp(), timestampRange.getEndTimestamp());
-            Integer warningCount = messageMapper.getMessageStatusCountByTime(uid, 1, timestampRange.getBeginTimestamp(), timestampRange.getEndTimestamp());
-            Integer dangerCount = messageMapper.getMessageStatusCountByTime(uid, 2, timestampRange.getBeginTimestamp(), timestampRange.getEndTimestamp());
+            Integer normalCount = messageMapper.getMessageTypeCountByTime(uid, 0, timestampRange.getBeginTimestamp(), timestampRange.getEndTimestamp());
+            Integer warningCount = messageMapper.getMessageTypeCountByTime(uid, 1, timestampRange.getBeginTimestamp(), timestampRange.getEndTimestamp());
+            Integer dangerCount = messageMapper.getMessageTypeCountByTime(uid, 2, timestampRange.getBeginTimestamp(), timestampRange.getEndTimestamp());
             return new ServiceResult(true, new MessageCount(normalCount, warningCount, dangerCount));
         } catch (Exception e) {
             e.printStackTrace();
