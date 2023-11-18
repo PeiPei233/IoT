@@ -158,15 +158,16 @@ export default function Searching() {
           ));
           Promise.all(res).then((res) => {
             setSearchResults(res);
+            setSearching(false)
           }).catch((err) => {
             console.log(err);
             notification.error({
               message: 'Search failed!',
               description: err.message,
             });
+            setSearching(false)
           })
         }
-        setSearching(false)
       })
       .catch(error => {
         console.error('Request Fail:', error);
