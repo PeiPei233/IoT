@@ -9,6 +9,7 @@ import jakarta.annotation.PostConstruct;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ public class MqttSubscriber {
 
     @PostConstruct
     public void init() throws Exception {
-        client = new MqttClient(brokerUrl, clientId);
+        client = new MqttClient(brokerUrl, clientId, new MemoryPersistence());
         MqttConnectOptions options = new MqttConnectOptions();
         options.setCleanSession(true);
         options.setAutomaticReconnect(true);
@@ -56,7 +57,10 @@ public class MqttSubscriber {
                 IOTMessage iotMessage = objectMapper.readValue(payload, IOTMessage.class);
                 Message message = new Message();
                 message.setType(iotMessage.getAlert());
-                message.setStatus(0);
+                message.setStatus(
+                        iotMessage.getValue() >= 0 ? 0 :
+                                iotMessage.getValue() == -1 ? 1 : 2
+                        );
                 message.setValue(iotMessage.getValue());
                 message.setInfo(iotMessage.getInfo());
                 message.setLng(iotMessage.getLng());

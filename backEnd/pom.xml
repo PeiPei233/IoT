@@ -80,6 +80,9 @@
 				<configuration>
 					<image>
 						<builder>paketobuildpacks/builder-jammy-base:latest</builder>
+						<env>
+							<BP_JVM_VERSION>${java.version}</BP_JVM_VERSION>
+						</env>
 					</image>
 				</configuration>
 			</plugin>
