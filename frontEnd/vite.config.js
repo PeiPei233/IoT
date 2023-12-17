@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
 
   build: {
+    outDir: '../backEnd/src/main/resources/static',
     rollupOptions: {
       output: {
         manualChunks(id) {

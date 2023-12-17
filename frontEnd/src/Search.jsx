@@ -52,6 +52,16 @@ const columns = [
     key: 'type',
   },
   {
+    title: 'Message',
+    dataIndex: 'message',
+    key: 'message',
+  },
+  {
+    title: 'Message Value',
+    dataIndex: 'value',
+    key: 'value'
+  },
+  {
     title: 'Time',
     dataIndex: 'time',
     key: 'time',
@@ -135,6 +145,7 @@ export default function Searching() {
             description: 'Please try again',
           });
         } else {
+          // console.log(response.data)
           const res = response.data.map((data) => (
             reGeoCode(data.lng, data.lat).then((res) => ({
               deviceID: String(values.did).padStart(8, '0'),
@@ -144,7 +155,9 @@ export default function Searching() {
               time: dateFormatter(new Date(data.timestamp)),
               location: res,
               lng: data.lng,
-              lat: data.lat
+              lat: data.lat,
+              message: data.message,
+              value: data.value
             })).catch((err) => ({
               deviceID: String(values.did).padStart(8, '0'),
               deviceName: data.deviceName,
@@ -153,7 +166,9 @@ export default function Searching() {
               time: dateFormatter(new Date(data.timestamp)),
               location: `${data.lng},${data.lat}`,
               lng: data.lng,
-              lat: data.lat
+              lat: data.lat,
+              message: data.message,
+              value: data.value
             }))
           ));
           Promise.all(res).then((res) => {
@@ -230,7 +245,7 @@ export default function Searching() {
           columns={columns}
           dataSource={searchResults}
           pagination={false}
-          scroll={{ y: 400, x: 550 }}
+          scroll={{ y: 400, x: 768 }}
           loading={searching}
         />
         {searchResults.length !== 0 && <Map

@@ -7,8 +7,24 @@ import './global.css'
 import NotFound from './NotFound.jsx';
 import { App } from 'antd';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+const isDev = import.meta.env.VITE_ENV === 'development'
+
+if (isDev) {
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    <React.StrictMode>
+      <App>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </App>
+    </React.StrictMode>,
+  )  
+} else {
+  ReactDOM.createRoot(document.getElementById('root')).render(
     <App>
       <BrowserRouter>
         <Routes>
@@ -17,6 +33,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
-    </App>
-  </React.StrictMode>,
-)
+    </App>,
+  )
+}
