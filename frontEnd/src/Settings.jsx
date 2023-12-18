@@ -19,7 +19,7 @@ const items = [
   }
 ];
 
-function Account() {
+function Account({ refreshUserInfo }) {
   const navigate = useNavigate()
 
   const [emailForm] = Form.useForm()
@@ -40,6 +40,7 @@ function Account() {
         if (response.data === 'success') {
           message.success('Change email successfully!');
           emailForm.resetFields()
+          refreshUserInfo()
         } else {
           notification.error({
             message: 'Change email failed!',
@@ -65,6 +66,7 @@ function Account() {
         if (response.data === 'success') {
           message.success('Change username successfully!');
           usernameForm.resetFields()
+          refreshUserInfo()
         } else {
           notification.error({
             message: 'Change username failed!',
@@ -83,16 +85,6 @@ function Account() {
 
   const onDeleteAccountFinish = (values) => {
     console.log('Received values of form: ', values);
-    // setTimeout(() => {
-    //   if (values.password === '123456') {
-    //     deleteAccountForm.resetFields()
-    //     setDeleteAccountModal(false)
-    //     message.success('Delete account successfully!')
-    //     navigate('/')
-    //   } else {
-    //     message.error('Wrong password!')
-    //   }
-    // }, 2000)
     axios.post(`${import.meta.env.VITE_API_URL}/api/user/delete`, values, {
       withCredentials: true
     })
@@ -458,7 +450,7 @@ export default function Settings() {
   const [email, setEmail] = useState('unknown@unkown.com');
   const [loadingInfo, setLoadingInfo] = useState(false)
 
-  useEffect(() => {
+  function refreshUserInfo() {
     setLoadingInfo(true)
     axios.get(`${import.meta.env.VITE_API_URL}/api/user/info`, {
       withCredentials: true
@@ -473,6 +465,10 @@ export default function Settings() {
       .finally(() => {
         setLoadingInfo(false)
       })
+  }
+
+  useEffect(() => {
+    refreshUserInfo()
   }, [])
 
   const onClick = (e) => {
@@ -510,7 +506,7 @@ export default function Settings() {
           />
         </Col>
         <Col xs={24} md={18}>
-          {current === 'account' ? <Account /> : <Password />}
+          {current === 'account' ? <Account refreshUserInfo={refreshUserInfo}/> : <Password />}
         </Col>
       </Row>
     </div>

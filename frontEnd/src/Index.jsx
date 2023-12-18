@@ -38,7 +38,7 @@ function Register({ setState, setLoading }) {
   const validateEmail = async (value) => {
     const emailPattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
     if (!emailPattern.test(value)) {
-      if (value.length !== 0) {
+      if (value && value.length !== 0) {
         throw new Error('The input is not valid E-mail!');
       }
     } else {
@@ -177,10 +177,16 @@ function Login({ setState, setLoading }) {
     })
       .then(response => {
         if (response.data === 'success') {
-          message.success('Login successfully!');
           navigate('/dashboard');
+          notification.success({
+            message: 'Login successfully!',
+            description: 'Welcome to IoT Platform!',
+          });
         } else {
-          message.error('Login failed!');
+          notification.error({
+            message: 'Login failed!',
+            description: 'Please check your username and password.',
+          });
         }
       })
       .catch(error => {
@@ -200,7 +206,6 @@ function Login({ setState, setLoading }) {
       name="normal_login"
       className="login-form"
       initialValues={{ remember: true }}
-      onFinish={onFinish}
       form={form}
     >
       <Form.Item

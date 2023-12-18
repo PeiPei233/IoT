@@ -77,7 +77,6 @@ export default function Devices() {
           throw new Error('Request Fail')
         }
         setOpenAddModal(false)
-        setComfirmLoading(false)
         setShowAddResult(true)
         setResult({
           'did': response.data,
@@ -89,7 +88,6 @@ export default function Devices() {
         addForm.resetFields()
       }).catch((error) => {
         console.error('Request Fail:', error)
-        setComfirmLoading(false)
         notification.error({
           message: 'Add device fail',
           description: 'Please check your input and try again',
@@ -97,6 +95,8 @@ export default function Devices() {
       })
     }).catch((info) => {
       console.log('Validate Failed:', info)
+    }).finally(() => {
+      setComfirmLoading(false)
     })
   }
 
@@ -314,7 +314,7 @@ export default function Devices() {
                 confirm({
                   title: 'Are you sure to delete this device?',
                   icon: <ExclamationCircleOutlined />,
-                  content: 'This action cannot be undone.',
+                  content: 'This action cannot be undone!',
                   okText: 'Delete',
                   okType: 'danger',
                   cancelText: 'Cancel',
@@ -331,6 +331,10 @@ export default function Devices() {
                       }
                       setShowModifyModal(false)
                       setDeleteLoading(false)
+                      notification.success({
+                        message: 'Delete device success',
+                        description: 'The device has been deleted',
+                      })
                       setLoading(true)
                       requestDevicesInfo(setLoading).then((data) => {
                         setDevices(data)
