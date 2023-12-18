@@ -170,7 +170,7 @@
 MQTT服务器则具有接受来自设备的报文并存储在数据库中的功能。这一部分是物联网设备与系统之间的关键连接，负责接收来自设备的数据，并将其存储在数据库中，以供后续的分析和使用。
 
 #figure(
-  image("assets/image.png", width: 80%)
+  image("assets/design/image.png", width: 80%)
 )
 
 后端功能：
@@ -372,7 +372,7 @@ create table message
 === ER 图
 
 #figure(
-  image("assets/image-10.png", width: 100%)
+  image("assets/design/image-10.png", width: 100%)
 )
 
 = 系统接口设计
@@ -598,19 +598,19 @@ create table message
 == 登录界面
 
 #figure(
-  image("assets/image-1.png", height: 45%)
+  image("assets/design/image-1.png", height: 45%)
 )
 
 == 注册界面
 
 #figure(
-  image("assets/image-2.png", height: 45%)
+  image("assets/design/image-2.png", height: 45%)
 )
 
 == 首页、设备数据统计可视化界面
 
 #figure(
-  image("assets/image-3.png", width: 80%)
+  image("assets/design/image-3.png", width: 80%)
 )
 
 == 用户信息管理界面
@@ -618,13 +618,13 @@ create table message
 修改用户名与邮箱：
 
 #figure(
-  image("assets/image-4.png", width: 80%)
+  image("assets/design/image-4.png", width: 80%)
 )
 
 修改密码：
 
 #figure(
-  image("assets/image-5.png", width: 80%)
+  image("assets/design/image-5.png", width: 80%)
 )
 
 == 设备信息管理界面
@@ -632,25 +632,25 @@ create table message
 信息展示：
 
 #figure(
-  image("assets/image-6.png", width: 80%)
+  image("assets/design/image-6.png", width: 80%)
 )
 
 添加设备：
 
 #figure(
-  image("assets/image-7.png", width: 60%)
+  image("assets/design/image-7.png", width: 60%)
 )
 
 修改、删除设备：
 
 #figure(
-  image("assets/image-8.png", width: 60%)
+  image("assets/design/image-8.png", width: 60%)
 )
 
 == 设备数据查询界面
 
 #figure(
-  image("assets/image-9.png", width: 80%)
+  image("assets/design/image-9.png", width: 80%)
 )
 
 = 系统出错处理

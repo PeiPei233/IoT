@@ -59,7 +59,7 @@
   pagebreak(weak: true)
 
   v(60pt)
-  image("logo.svg", width: 50%)
+  image("assets/logo.svg", width: 50%)
   v(20pt)
   text(font: "Source Han Serif SC", size: san, weight: "bold")[本科实验报告]
   v(50pt)
@@ -252,17 +252,15 @@
 
   set text(font: song, size: xiaosi, lang: "zh")
 
-  if body != none {
-    set page(numbering: (..numbers) => locate(loc => {
-      let body-start = counter(page).at(body-start-loc.final(loc)).at(0)
-      let outline-start = counter(page).at(outline-start-loc.final(loc)).at(0)
-      if numbers.pos().at(0) >= body-start {
-        numbering("1", numbers.pos().at(0) - body-start + 1)
-      } else if numbers.pos().at(0) >= outline-start {
-        numbering("I", numbers.pos().at(0) - outline-start + 1)
-      }
-    }))
-  }
+  set page(numbering: (..numbers) => locate(loc => {
+    let body-start = counter(page).at(body-start-loc.final(loc)).at(0)
+    let outline-start = counter(page).at(outline-start-loc.final(loc)).at(0)
+    if numbers.pos().at(0) >= body-start {
+      numbering("1", numbers.pos().at(0) - body-start + 1)
+    } else if numbers.pos().at(0) >= outline-start {
+      numbering("I", numbers.pos().at(0) - outline-start + 1)
+    }
+  }))
 
   // outline page
   if show-outline {
