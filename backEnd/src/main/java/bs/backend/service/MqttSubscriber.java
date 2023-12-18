@@ -66,14 +66,19 @@ public class MqttSubscriber {
                 message.setLng(iotMessage.getLng());
                 message.setLat(iotMessage.getLat());
                 message.setTimestamp(iotMessage.getTimestamp());
-                if (iotMessage.getClientId().startsWith("device")) {
-                    message.setDid(Integer.parseInt(iotMessage.getClientId().substring(6)));
-                } else {
-                    message.setDid(Integer.parseInt(iotMessage.getClientId()));
+                try {
+                    if (iotMessage.getClientId().startsWith("device")) {
+                        message.setDid(Integer.parseInt(iotMessage.getClientId().substring(6)));
+                    } else {
+                        message.setDid(Integer.parseInt(iotMessage.getClientId()));
+                    }
+                    System.out.println(message);
+                    messageMapper.insertMessage(message);
+                    deviceMapper.updateDeviceStatusByDid(message.getDid(), message.getType());
+                } catch (Exception e) {
+                    System.out.println("Insert message failed - Device not found with ID: " + iotMessage.getClientId());
                 }
-                System.out.println(message);
-                messageMapper.insertMessage(message);
-                deviceMapper.updateDeviceStatusByDid(message.getDid(), message.getType());
+                System.out.println("Message inserted");
             } catch (Exception e) {
                 e.printStackTrace();
             }
