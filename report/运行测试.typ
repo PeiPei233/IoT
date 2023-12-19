@@ -329,7 +329,111 @@
   image("assets/test/normal-send-3.png", width: 80%)
 )
 
+== 安全性测试
+
+=== SQL注入
+
+测试用例：SQL注入。在用户登录界面，输入用户名 `admin`，密码 `123456' or '1'='1`，可以看到系统弹出错误提示，提示用户名或密码错误。
+
+#figure(
+  image("assets/test/sql-injection.png", width: 80%)
+)
+
+=== 未登录用户访问
+
+测试用例：未登录用户访问。在用户未登录时，强行访问 `/dashboard`，可以看到系统弹出错误提示，提示用户未登录，并跳转到登录界面。
+
+#figure(
+  image("assets/test/unauthorized.png", width: 80%)
+)
+
+=== 密码加密
+
+测试用例：密码加密。在数据库中，可以看到用户的密码已经被加密。
+
+#figure(
+  image("assets/test/encrypt.png", width: 80%)
+)
+
+== 移动端兼容性测试
+
+使用开发者工具，模拟移动端浏览器进行测试。
+
+=== 登录注册界面
+
+#align(center, grid(
+  columns: (auto, auto),
+  image("assets/test/mobile-login.png", width: 80%),
+  image("assets/test/mobile-register.png", width: 80%)
+))
+
+可以看到，登录注册界面在移动端浏览器上正常显示。
+
+=== 消息统计界面
+
+数据图表如下：
+
+#figure(
+  image("assets/test/mobile-stat.png", width: 40%)
+)
+
+表格可以上下或者左右滚动，效果如下：
+
+#figure(
+  image("assets/test/mobile-stat-table.png", width: 40%)
+)
+
+地图如下：
+
+#figure(
+  image("assets/test/mobile-stat-map.png", width: 40%)
+)
+
+可以看到，消息统计界面在移动端浏览器上正常显示。
+
+=== 设备管理界面
+
+#figure(
+  image("assets/test/mobile-device.png", width: 40%)
+)
+
+可以看到，设备管理界面在移动端浏览器上正常显示。
+
+=== 设备消息查询界面
+
+查询结果表格可以上下或者左右滚动，效果如下：
+
+#figure(
+  image("assets/test/mobile-query.png", width: 40%)
+)
+
+查询结果地图如下：
+
+#figure(
+  image("assets/test/mobile-query-map.png", width: 30%)
+)
+
+可以看到，设备消息查询界面在移动端浏览器上正常显示。
+
+=== 用户信息设置界面
+
+菜单栏以及修改信息的表单可以正常显示，效果如下：
+
+#align(center, grid(
+  columns: (auto, auto),
+  image("assets/test/mobile-user.png", width: 70%),
+  image("assets/test/mobile-user-form.png", width: 70%)
+))
+
+可以看到，用户信息设置界面在移动端浏览器上正常显示。
 
 = 测试结论
 
+本次测试覆盖了系统的所有功能，包括用户登录、用户注册、用户信息设置、设备管理、设备消息查询、消息统计、设备发送消息等等。测试结果显示，系统的所有功能均正常运行，符合设计和用户需求。系统的安全性也得到了验证，包括但不限于防止SQL注入、密码加密等。系统的兼容性也得到了验证，可以在不同的浏览器和操作系统上正常运行。
+
 = 后续建议
+
+- 定期维护：为了确保系统的稳定性和安全性，建议定期维护系统，包括但不限于更新系统、修复漏洞等。
+- 用户反馈：建议增加用户反馈功能，以便用户可以及时反馈系统的问题，以便及时修复。
+- 扩展测试：随着用户量的增加，定期进行更广泛的性能和安全测试。
+- 数据备份：建立定期数据备份机制，确保数据安全。
