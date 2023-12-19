@@ -207,6 +207,7 @@ function Login({ setState, setLoading }) {
       className="login-form"
       initialValues={{ remember: true }}
       form={form}
+      onFinish={onFinish}
     >
       <Form.Item
         name="username"
