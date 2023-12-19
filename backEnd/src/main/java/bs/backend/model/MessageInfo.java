@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MessageInfo {
+    private Integer mid;
     private String message;
     private Long timestamp;
     private Integer type;

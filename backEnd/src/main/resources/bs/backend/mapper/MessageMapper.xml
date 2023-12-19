@@ -25,20 +25,20 @@
 
     <select id="getMessages" resultType="bs.backend.model.MessageInfo">
         <![CDATA[
-        SELECT m.info as message, m.timestamp, m.type, m.lng, m.lat, m.status, m.value, d.name as deviceName
+        SELECT m.mid as mid, m.info as message, m.timestamp, m.type, m.lng, m.lat, m.status, m.value, d.name as deviceName
         FROM message m
         JOIN device d on d.did = m.did
         WHERE d.uid = #{uid}
             AND (#{beginTime} IS NULL OR m.timestamp >= #{beginTime})
           AND (#{endTime} IS NULL OR m.timestamp <= #{endTime})
         ORDER BY m.timestamp DESC
-        LIMIT 50
+        LIMIT 25
         ]]>
     </select>
 
     <select id="getMessagesByDid" resultType="bs.backend.model.MessageInfo">
         <![CDATA[
-        SELECT m.info as message, m.timestamp, m.type, m.lng, m.lat, m.status, m.value, d.name as deviceName
+        SELECT m.mid as mid, m.info as message, m.timestamp, m.type, m.lng, m.lat, m.status, m.value, d.name as deviceName
         FROM message m
                  JOIN device d on d.did = m.did
         WHERE d.uid = #{uid}
@@ -50,7 +50,7 @@
     </select>
 
     <select id="getDeviceLatestEach" resultType="bs.backend.model.MessageInfo">
-        SELECT m.info as message, m.timestamp, m.type, m.lng, m.lat, m.status, m.value, d.name as deviceName
+        SELECT m.mid as mid, m.info as message, m.timestamp, m.type, m.lng, m.lat, m.status, m.value, d.name as deviceName
         FROM
             message m
                 INNER JOIN
