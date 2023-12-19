@@ -485,8 +485,8 @@ export default function Dashboard() {
                   {!loadingLatestDevicesStatusData &&
                     <Map
                       style={{
-                        height: windowWidth < 768 ? windowWidth - 147 : 500,
-                        width: windowWidth < 768 ? windowWidth - 147 : '100%',
+                        height: windowWidth < 768 ? windowWidth - 144 : 500,
+                        width: windowWidth < 768 ? windowWidth - 144 : '100%',
                         borderRadius: 8,
                         overflow: 'hidden',
                         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
@@ -495,6 +495,7 @@ export default function Dashboard() {
                         {
                           position: [data.lng, data.lat],
                           title: data.device,
+                          data: data
                         }
                       ))}
                     />}
@@ -503,7 +504,7 @@ export default function Dashboard() {
                   <h3>Latest Devices Status</h3>
                   {!loadingLatestDevicesStatusData && groupLatestDevicesStatusData.length !== 0 &&
                     <Carousel autoplay style={{
-                      width: windowWidth < 768 ? windowWidth - 147 : '100%',
+                      width: windowWidth < 768 ? windowWidth - 144 : '100%',
                     }}>
                       {/* {console.log(groupLatestDevicesStatusData)} */}
                       {
