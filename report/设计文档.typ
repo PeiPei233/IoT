@@ -165,13 +165,13 @@
 
 系统的总体架构如下图所示，这是一个高度可扩展的架构，旨在支持多种终端的访问，包括PC和手机等。我们的服务端主要由两部分组成：后端服务器和MQTT服务器。这两部分分别与数据库进行交互，以实现系统的各项功能。
 
-后端服务器具有处理来自网页的HTTP请求的能力，这意味着它可以接受用户在网页上发出的请求，并对其进行处理。这是用户与系统交互的主要接口之一，负责处理用户的请求并提供相应的数据和功能。
-
-MQTT服务器则具有接受来自设备的报文并存储在数据库中的功能。这一部分是物联网设备与系统之间的关键连接，负责接收来自设备的数据，并将其存储在数据库中，以供后续的分析和使用。
-
 #figure(
   image("assets/design/image.png", width: 80%)
 )
+
+后端服务器具有处理来自网页的HTTP请求的能力，这意味着它可以接受用户在网页上发出的请求，并对其进行处理。这是用户与系统交互的主要接口之一，负责处理用户的请求并提供相应的数据和功能。
+
+MQTT服务器则具有接受来自设备的报文并存储在数据库中的功能。这一部分是物联网设备与系统之间的关键连接，负责接收来自设备的数据，并将其存储在数据库中，以供后续的分析和使用。
 
 后端功能：
 - 处理用户的需求输入
@@ -228,11 +228,11 @@ MQTT服务器功能：
 
 选用 Spring Boot 框架，使用 Java 语言编写后端代码。Spring Boot 是一个用于构建 Java 应用程序的框架，它可以帮助我们快速构建基于 Spring 的应用程序。Spring Boot 提供了一系列的工具和插件，可以帮助我们快速搭建应用程序的基本框架，从而提高开发效率。
 
-同时，也使用了 Spring MVC 框架，用于构建后端接口。Spring MVC 是一个用于构建后端接口的框架，它提供了一系列的工具和插件，可以帮助我们快速构建后端接口，从而实现前后端的交互。Spring MVC 的接口具有良好的可定制性，可以帮助我们快速构建后端接口，从而提高开发效率。
+使用 Spring MVC 框架，用于构建后端接口。Spring MVC 是一个用于构建后端接口的框架，它提供了一系列的工具和插件，可以帮助我们快速构建后端接口，从而实现前后端的交互。Spring MVC 的接口具有良好的可定制性，可以帮助我们快速构建后端接口，从而提高开发效率。
 
-同时，也使用了 Eclipse Paho 的 MQTT 客户端，用于与 MQTT 服务器进行通信。Eclipse Paho 是一个用于构建 MQTT 客户端的框架，它提供了一系列的工具和插件，可以帮助我们快速构建 MQTT 客户端，从而实现与 MQTT 服务器的通信。
+使用 Eclipse Paho 的 MQTT 客户端，用于与 MQTT 服务器进行通信。Eclipse Paho 是一个用于构建 MQTT 客户端的框架，它提供了一系列的工具和插件，可以帮助我们快速构建 MQTT 客户端，从而实现与 MQTT 服务器的通信。
 
-同时，也使用了 MyBatis 的持久层框架，用于与数据库进行交互。MyBatis 是一个用于构建持久层的框架，它提供了一系列的工具和插件，可以帮助我们快速构建持久层，从而实现与数据库的交互。
+使用 MyBatis 的持久层框架，用于与数据库进行交互。MyBatis 是一个用于构建持久层的框架，它提供了一系列的工具和插件，可以帮助我们快速构建持久层，从而实现与数据库的交互。
 
 === 数据库技术栈
 
@@ -242,7 +242,7 @@ MQTT服务器功能：
 
 选用 Mosquitto 服务器，用于接收设备上报的数据，并将其存储在数据库中。Mosquitto 是一个开源的 MQTT 服务器，它可以帮助我们接收设备上报的数据，并将其存储在数据库中。Mosquitto 提供了一系列的工具和插件，可以帮助我们快速构建 MQTT 服务器，从而实现与设备的通信。
 
-同时，也使用了 Eclipse Paho 模拟 MQTT 设备，用于发布模拟信号，用 mqtt 协议与 MQTT 服务器进行通信。Eclipse Paho 模拟 MQTT 设备是一个开源的 MQTT 设备模拟器，它可以帮助我们发布模拟信号，用 mqtt 协议与 MQTT 服务器进行通信。
+使用了 Eclipse Paho 模拟 MQTT 设备，用于发布模拟信号，用 mqtt 协议与 MQTT 服务器进行通信。Eclipse Paho 模拟 MQTT 设备是一个开源的 MQTT 设备模拟器，它可以帮助我们发布模拟信号，用 mqtt 协议与 MQTT 服务器进行通信。
 
 = 数据处理
 
@@ -277,18 +277,18 @@ MQTT服务器功能：
 建表语句如下：
 
 ```sql
-create table user
-(
-    uid      int auto_increment
-        primary key,
-    email    varchar(255) not null,
-    username varchar(255) not null,
-    password varchar(255) not null,
-    constraint user_pk2
-        unique (username),
-    constraint user_pk3
-        unique (email)
-);
+    create table user
+    (
+        uid      int auto_increment
+            primary key,
+        email    varchar(255) not null,
+        username varchar(255) not null,
+        password varchar(255) not null,
+        constraint user_pk2
+            unique (username),
+        constraint user_pk3
+            unique (email)
+    );
 ```
 
 === 设备表
@@ -312,19 +312,19 @@ create table user
 建表语句如下：
 
 ```sql
-create table device
-(
-    did      int auto_increment
-        primary key,
-    name     varchar(255)  not null,
-    type     varchar(255)  null,
-    location varchar(255)  null,
-    status   int default 0 not null,
-    uid      int           not null,
-    constraint device_user_uid_fk
-        foreign key (uid) references user (uid)
-            on update cascade on delete cascade
-);
+    create table device
+    (
+        did      int auto_increment
+            primary key,
+        name     varchar(255)  not null,
+        type     varchar(255)  null,
+        location varchar(255)  null,
+        status   int default 0 not null,
+        uid      int           not null,
+        constraint device_user_uid_fk
+            foreign key (uid) references user (uid)
+                on update cascade on delete cascade
+    );
 ```
 
 === 数据表
@@ -351,22 +351,22 @@ create table device
 建表语句如下：
 
 ```sql
-create table message
-(
-    mid       int auto_increment
-        primary key,
-    type      int default 0 null,
-    status    int default 0 not null,
-    value     int           null,
-    info      varchar(255)  null,
-    lng       double        null,
-    lat       double        null,
-    timestamp mediumtext    not null,
-    did       int           not null,
-    constraint message_device_did_fk
-        foreign key (did) references device (did)
-            on update cascade on delete cascade
-);
+    create table message
+    (
+        mid       int auto_increment
+            primary key,
+        type      int default 0 null,
+        status    int default 0 not null,
+        value     int           null,
+        info      varchar(255)  null,
+        lng       double        null,
+        lat       double        null,
+        timestamp mediumtext    not null,
+        did       int           not null,
+        constraint message_device_did_fk
+            foreign key (did) references device (did)
+                on update cascade on delete cascade
+    );
 ```
 
 === ER 图

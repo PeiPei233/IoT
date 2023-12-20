@@ -67,16 +67,39 @@
 在项目根目录（即包含 `docker-compose.yml` 文件的目录）执行以下命令即可启动项目：
 
 ```bash
-    docker load -i iot.tar
+    docker load -i backend.tar
     docker-compose up
 ```
 
 上述方式启动的并未包括模拟终端。如需一同启动模拟终端，请执行以下命令：
 
 ```bash
-    docker load -i iot.tar
+    docker load -i backend.tar
+    docker load -i iotclient.tar
     docker-compose -f docker-compose-with-client.yml up
 ```
+
+使用此方式启动的模拟器会模拟 ID 为 00001 至 00005 的设备发消息，发消息的间隔时间最大10秒。如需修改模拟器的配置，请修改 `docker-compose-with-client.yml` 文件中 `client` 的环境变量。也可以只启动未包括模拟器的后端服务，然后在本地使用以下命令启动模拟器：
+
+```bash
+    docker load -i iotclient.tar
+    docker run --net=host iotclient:1.0.0 -e \
+      DEVICES=${YOUR_DEVICES} \
+      SERVER=tcp://localhost:1883 \
+      TOPIC=testapp \
+      PREFIX="" \
+      INTERVAL_BOUND=${YOUR_INTERVAL_BOUND} \
+      CLIENT_ID=${YOUR_CLIENT_ID}
+```
+
+其中各个环境变量的含义如下：
+
+/ `DEVICES`: 模拟器模拟的设备数量，默认为 5。若将该值设置为一个正整数，则模拟器会模拟 ID 为 00001 至 0000n 的设备发消息，其中 n 为该值。
+/ `SERVER`: 模拟器连接的服务器地址，默认为 `tcp://localhost:1883`。
+/ `TOPIC`: 模拟器发送消息的主题，默认为 `testapp`。
+/ `PREFIX`: 模拟器发送消息时给设备 ID 添加的前缀，默认为空。
+/ `INTERVAL_BOUND`: 模拟器发送消息的间隔时间的上界，默认为 10 秒。若将该值设置为一个正整数，则模拟器每次发消息前会随机生成一个 0 至该值之间的浮点数，作为发送消息的间隔时间。
+/ `CLIENT_ID`: 模拟器一定会模拟的设备 ID，默认为 -1，表示不特定模拟某个设备。若将该值设置为一个正整数，则模拟器除了按照 `DEVICES` 的规则模拟设备外，还会模拟该 ID 的设备发消息。
 
 == 使用源码安装
 
@@ -116,8 +139,18 @@
       cd iotclient
       mvn clean install
       cd target
+      cp ../src/main/resources/iot.properties .
       java -jar iotclient-1.0.0.jar
 ```
+
+你可以通过环境变量来配置模拟器的行为，如第1.1节所述。也可以修改 `iot.properties` 文件来配置模拟器的行为，各个配置项的含义如下：
+
+/ `devices`: 模拟器模拟的设备数量，默认为 5。若将该值设置为一个正整数，则模拟器会模拟 ID 为 00001 至 0000n 的设备发消息，其中 n 为该值。
+/ `server`: 模拟器连接的服务器地址，默认为 `tcp://localhost:1883`。
+/ `topic`: 模拟器发送消息的主题，默认为 `testapp`。
+/ `prefix`: 模拟器发送消息时给设备 ID 添加的前缀，默认为空。
+/ `interval_bound`: 模拟器发送消息的间隔时间的上界，默认为 10 秒。若将该值设置为一个正整数，则模拟器每次发消息前会随机生成一个 0 至该值之间的浮点数，作为发送消息的间隔时间。
+/ `client_id`: 模拟器一定会模拟的设备 ID，默认为 -1，表示不特定模拟某个设备。若将该值设置为一个正整数，则模拟器除了按照 `devices` 的规则模拟设备外，还会模拟该 ID 的设备发消息。
 
 = 功能介绍
 
@@ -228,7 +261,7 @@
   image("assets/manual/devices-add-success.png", width: 50%)
 )
 
-在该提示框中也可以看到生成的对应的设备 ID，用于发送消息。点击 #inline-button("Done") 按钮，即可关闭该提示框。也可以点击 #inline-button(bg-color: rgb(31,136,61),"Add Another") 按钮，继续添加设备。
+在该提示框中也可以看到生成的对应的设备 ID，用于发送消息。点击 #inline-button("Done") 按钮，即可关闭该提示框。也可以点击 #inline-button(bg-color: rgb(31,136,61),"Add Another") 按钮，继续添加设备。若用户有需要，也可以根据对话框中的提示，点击 #inline-link[documentation] 链接，查看如何发送消息。
 
 === 修改或删除设备
 
@@ -316,7 +349,7 @@
   image("assets/manual/settings-delete.png", width: 50%)
 )
 
-在该对话框中，用户输入密码，点击 #inline-button(bg-color: rgb(255,77,79))[I'm sure, delete my account!] 按钮即可删除账户。删除成功后会跳转到登录界面。
+在该对话框中，用户输入密码，点击 #inline-button(bg-color: rgb(255,77,79))[I\'m sure, delete my account!] 按钮即可删除账户。删除成功后会跳转到登录界面。
 
 ==== 修改密码
 
