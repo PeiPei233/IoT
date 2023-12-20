@@ -5,6 +5,7 @@ import bs.backend.service.ServiceResult;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.relational.core.sql.In;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,12 +44,12 @@ public class UserController {
 
     @GetMapping("/logout")
     public ResponseEntity<String> logout(HttpSession session) {
-        if (session.getAttribute("uid") != null) {
-            session.invalidate();
-            return ResponseEntity.ok("success");
-        } else {
-            return ResponseEntity.badRequest().body("fail");
+        Integer uid = (Integer) session.getAttribute("uid");
+        if (uid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 401 (Unauthorized)
         }
+        session.invalidate();
+        return ResponseEntity.ok("success");
     }
 
     @PostMapping("/register")
@@ -63,16 +64,16 @@ public class UserController {
 
     @PostMapping("/delete")
     public ResponseEntity<String> delete(@RequestBody User user, HttpSession session) {
-        if (session.getAttribute("uid") != null) {
-            ServiceResult result = userService.delete((Integer) session.getAttribute("uid"), user.getPassword());
-            if (result.isSuccess()) {
-                session.invalidate();
-                return ResponseEntity.ok("success");
-            } else {
-                return ResponseEntity.ok((String) result.getData());
-            }
+        Integer uid = (Integer) session.getAttribute("uid");
+        if (uid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 401 (Unauthorized)
+        }
+        ServiceResult result = userService.delete(uid, user.getPassword());
+        if (result.isSuccess()) {
+            session.invalidate();
+            return ResponseEntity.ok("success");
         } else {
-            return ResponseEntity.badRequest().body("fail");
+            return ResponseEntity.ok((String) result.getData());
         }
     }
 
@@ -98,13 +99,13 @@ public class UserController {
 
     @GetMapping("/info")
     public ResponseEntity<User> getUserInfo(HttpSession session) {
-        if (session.getAttribute("uid") != null) {
-            ServiceResult result = userService.getUserInfo((Integer) session.getAttribute("uid"));
-            if (result.isSuccess()) {
-                return ResponseEntity.ok((User) result.getData());
-            } else {
-                return ResponseEntity.badRequest().body(null);
-            }
+        Integer uid = (Integer) session.getAttribute("uid");
+        if (uid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 401 (Unauthorized)
+        }
+        ServiceResult result = userService.getUserInfo(uid);
+        if (result.isSuccess()) {
+            return ResponseEntity.ok((User) result.getData());
         } else {
             return ResponseEntity.badRequest().body(null);
         }
@@ -112,15 +113,15 @@ public class UserController {
 
     @PostMapping("/changeUsername")
     public ResponseEntity<String> changeUsername(@RequestBody User user, HttpSession session) {
-        if (session.getAttribute("uid") != null) {
-            ServiceResult result = userService.updateUsername((Integer) session.getAttribute("uid"), user.getUsername());
-            if (result.isSuccess()) {
-                return ResponseEntity.ok("success");
-            } else {
-                return ResponseEntity.ok("fail");
-            }
+        Integer uid = (Integer) session.getAttribute("uid");
+        if (uid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 401 (Unauthorized)
+        }
+        ServiceResult result = userService.updateUsername(uid, user.getUsername());
+        if (result.isSuccess()) {
+            return ResponseEntity.ok("success");
         } else {
-            return ResponseEntity.badRequest().body("fail");
+            return ResponseEntity.ok("fail");
         }
     }
 
@@ -132,22 +133,26 @@ public class UserController {
 
     @PostMapping("/changePassword")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest, HttpSession session) {
-        if (session.getAttribute("uid") != null) {
-            ServiceResult result = userService.updatePassword((Integer) session.getAttribute("uid"), changePasswordRequest.getOldPassword(), changePasswordRequest.getNewPassword());
-            if (result.isSuccess()) {
-                return ResponseEntity.ok("success");
-            } else {
-                return ResponseEntity.ok((String) result.getData());
-            }
+        Integer uid = (Integer) session.getAttribute("uid");
+        if (uid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 401 (Unauthorized)
+        }
+        ServiceResult result = userService.updatePassword((Integer) session.getAttribute("uid"), changePasswordRequest.getOldPassword(), changePasswordRequest.getNewPassword());
+        if (result.isSuccess()) {
+            return ResponseEntity.ok("success");
         } else {
-            return ResponseEntity.badRequest().body("fail");
+            return ResponseEntity.ok((String) result.getData());
         }
     }
 
     @PostMapping("/changeEmail")
     public ResponseEntity<String> changeEmail(@RequestBody User user, HttpSession session) {
-        if (session.getAttribute("uid") != null && user.getEmail() != null) {
-            ServiceResult result = userService.updateEmail((Integer) session.getAttribute("uid"), user.getEmail());
+        Integer uid = (Integer) session.getAttribute("uid");
+        if (uid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 401 (Unauthorized)
+        }
+        if (user.getEmail() != null) {
+            ServiceResult result = userService.updateEmail(uid, user.getEmail());
             if (result.isSuccess()) {
                 return ResponseEntity.ok("success");
             } else {

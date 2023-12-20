@@ -8,21 +8,6 @@ const { confirm } = Modal
 const { Search } = Input
 const { Text, Title } = Typography
 
-async function requestDevicesInfo() {
-  try {
-    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/device/list`, {
-      withCredentials: true
-    })
-    if (response.status !== 200) {
-      throw new Error('Request Fail')
-    }
-    return response.data
-  } catch (error) {
-    console.error('Request Fail:', error)
-    throw error
-  }
-}
-
 export default function Devices() {
 
   const [loading, setLoading] = useState(true)
@@ -39,6 +24,29 @@ export default function Devices() {
   const [addForm] = Form.useForm()
   const [modifyForm] = Form.useForm()
   const { notification, message } = App.useApp()
+
+  async function requestDevicesInfo() {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/device/list`, {
+        withCredentials: true
+      })
+      if (response.status !== 200) {
+        throw new Error('Request Fail')
+      }
+      return response.data
+    } catch (error) {
+      console.error('Request Fail:', error)
+      if (error.response && error.response.status === 401) {
+        notification.error({
+          message: 'Please login first!',
+          description: 'You have not logged in yet, please log in first!',
+        })
+        navigate('/')
+      } else {
+        throw error
+      }
+    }
+  }
 
   useEffect(() => {
     setLoading(true)
@@ -88,10 +96,18 @@ export default function Devices() {
         addForm.resetFields()
       }).catch((error) => {
         console.error('Request Fail:', error)
-        notification.error({
-          message: 'Add device fail',
-          description: 'Please check your input and try again',
-        })
+        if (error.response && error.response.status === 401) {
+          notification.error({
+            message: 'Please login first!',
+            description: 'You have not logged in yet, please log in first!',
+          })
+          navigate('/')
+        } else {
+          notification.error({
+            message: 'Add device fail',
+            description: 'Please check your input and try again',
+          })
+        }
       })
     }).catch((info) => {
       console.log('Validate Failed:', info)
@@ -123,11 +139,10 @@ export default function Devices() {
       }, {
         withCredentials: true
       }).then((response) => {
-        if (response.status !== 200 || response.data === 'fail') {
+        if (response.data === 'fail') {
           throw new Error('Request Fail')
         }
         setShowModifyModal(false)
-        setComfirmLoading(false)
         setLoading(true)
         requestDevicesInfo(setLoading).then((data) => {
           setDevices(data)
@@ -142,17 +157,30 @@ export default function Devices() {
           })
           .finally(() => {
             setLoading(false)
+            notification.success({
+              message: 'Modify device success',
+              description: 'The device has been modified',
+            })
           })
       }).catch((error) => {
         console.error('Request Fail:', error)
-        setComfirmLoading(false)
-        notification.error({
-          message: 'Modify device fail',
-          description: 'Please check your input and try again',
-        })
+        if (error.response && error.response.status === 401) {
+          notification.error({
+            message: 'Please login first!',
+            description: 'You have not logged in yet, please log in first!',
+          })
+          navigate('/')
+        } else {
+          notification.error({
+            message: 'Modify device fail',
+            description: 'Please check your input and try again',
+          })
+        }
       })
     }).catch((info) => {
       console.log('Validate Failed:', info)
+    }).finally(() => {
+      setComfirmLoading(false)
     })
   }
 
@@ -213,7 +241,7 @@ export default function Devices() {
           tooltip='Add a new device'
           onClick={openModal}
         />
-        <FloatButton 
+        <FloatButton
           tooltip='Document'
           onClick={() => setShowDocModal(true)}
         />
@@ -330,7 +358,6 @@ export default function Devices() {
                         throw new Error('Request Fail')
                       }
                       setShowModifyModal(false)
-                      setDeleteLoading(false)
                       notification.success({
                         message: 'Delete device success',
                         description: 'The device has been deleted',
@@ -352,11 +379,20 @@ export default function Devices() {
                         })
                     }).catch((error) => {
                       console.error('Request Fail:', error)
+                      if (error.response && error.response.status === 401) {
+                        notification.error({
+                          message: 'Please login first!',
+                          description: 'You have not logged in yet, please log in first!',
+                        })
+                        navigate('/')
+                      } else {
+                        notification.error({
+                          message: 'Delete device fail',
+                          description: error,
+                        })
+                      }
+                    }).finally(() => {
                       setDeleteLoading(false)
-                      notification.error({
-                        message: 'Delete device fail',
-                        description: error,
-                      })
                     })
                   },
                   onCancel() {
@@ -387,12 +423,14 @@ export default function Devices() {
           <Form.Item
             name="name"
             label="Device Name"
+            rules={[{ required: true, message: 'Please input device name!' }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="type"
             label="Device Type"
+            rules={[{ required: true, message: 'Please input device type!' }]}
           >
             <Input />
           </Form.Item>
@@ -471,7 +509,7 @@ export default function Devices() {
             <div>{'}'}</div>
           </div>
         </div>
-          
+
       </Modal>
     </div>
   )

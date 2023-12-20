@@ -109,7 +109,7 @@ const Home = ({ current }) => {
         })
         .catch(error => {
           console.error('Request Fail:', error);
-          if (error.response.status === 400) {
+          if (error.response && error.response.status === 401) {
             notification.error({
               message: 'Please login first!',
               description: 'You have not logged in yet, please log in first!',
@@ -128,31 +128,6 @@ const Home = ({ current }) => {
       )
     }
   }
-
-  const validateUser = async () => {
-    await axios.get(`${import.meta.env.VITE_API_URL}/api/user/info`, {
-      withCredentials: true
-    })
-      .then(response => {
-        if (response.status !== 200) {
-          throw new Error('Request Fail');
-        }
-      })
-      .catch(error => {
-        throw error;
-      })
-  }
-
-  useEffect(() => {
-    validateUser().catch((error) => {
-      console.error(error);
-      notification.error({
-        message: 'Please login first!',
-        description: 'You have not logged in yet, please log in first!',
-      });
-      navigate('/');
-    })
-  }, []);
 
   const onClick = (e) => {
     console.log('click ', e);
@@ -179,13 +154,13 @@ const Home = ({ current }) => {
           } else {
             notification.error({
               message: 'Logout failed!',
-              description: 'Please try again later!',
+              description: response.data || 'Please try again later!',
             });
           }
         })
         .catch(error => {
           console.error('Request Fail:', error);
-          if (error.response.status === 400) {
+          if (error.response && error.response.status === 401) {
             notification.error({
               message: 'Please login first!',
               description: 'You have not logged in yet, please log in first!',

@@ -6,6 +6,7 @@ import { IconLocation, IconClockCircle } from '@arco-design/web-react/icon';
 import { Link, useNavigate } from "react-router-dom";
 import Map from "./Map"
 import axios from "axios";
+import { reGeoCode } from "./utils";
 
 const { Text, Title } = Typography;
 
@@ -18,13 +19,6 @@ const dateFormatter = Intl.DateTimeFormat('zh', {
   second: '2-digit',
   hour12: false,
 }).format;
-
-async function reGeoCode(lng, lat) {
-  const url = 'https://restapi.amap.com/v3/geocode/regeo?output=json&location='
-    + lng + ',' + lat + '&key=' + import.meta.env.VITE_AMAP_KEY + '&radius=1000&extensions=all';
-  const response = await axios.get(url);
-  return response.data.regeocode.formatted_address;
-}
 
 async function requestDevicesData() {
   const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/device/briefInfo`, {
@@ -203,66 +197,56 @@ export default function Dashboard() {
   const [groupLatestDevicesStatusData, setGroupLatestDevicesStatusData] = useState([]);
   const [showDocModal, setShowDocModal] = useState(false);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    }
-
-    window.addEventListener('resize', handleResize);
-
-    requestDevicesData().then((res) => {
-      setDevicesData(res);
-      setLoadingDevicesData(false);
-    }).catch((err) => {
-      console.log(err);
+  const requestFailed = (err) => {
+    console.log(err);
+    if (err.response && err.response.status === 401) {
+      notification.error({
+        message: 'Please login first!',
+        description: 'You have not logged in yet, please log in first!',
+      });
+      navigate('/');
+    } else {
       notification.error({
         message: 'Request failed!',
         description: err.message,
       });
+    }
+  }
+
+  const getAllData = () => {
+    requestDevicesData().then((res) => {
+      setDevicesData(res);
+      setLoadingDevicesData(false);
+    }).catch((err) => {
+      requestFailed(err);
     })
 
     requestMessagesData().then((res) => {
       setMessagesData(res);
       setLoadingMessagesData(false);
     }).catch((err) => {
-      console.log(err);
-      notification.error({
-        message: 'Request failed!',
-        description: err.message,
-      });
+      requestFailed(err);
     })
 
     requestMessagesDailyData().then((res) => {
       setMessagesDailyData(res);
       setLoadingMessagesDailyData(false);
     }).catch((err) => {
-      console.log(err);
-      notification.error({
-        message: 'Request failed!',
-        description: err.message,
-      });
+      requestFailed(err);
     })
 
     requestLatestMessagesData().then((res) => {
       setLatestMessagesData(res);
       setLoadingLatestMessagesData(false);
     }).catch((err) => {
-      console.log(err);
-      notification.error({
-        message: 'Request failed!',
-        description: err.message,
-      });
+      requestFailed(err);
     })
 
     requestMostDevicesMessagesData().then((res) => {
       setMostDevicesMessagesData(res);
       setLoadingMostDevicesMessagesData(false);
     }).catch((err) => {
-      console.log(err);
-      notification.error({
-        message: 'Request failed!',
-        description: err.message,
-      });
+      requestFailed(err);
     })
 
     requestLatestDevicesStatusData().then((res) => {
@@ -274,13 +258,36 @@ export default function Dashboard() {
       setLoadingLatestDevicesStatusData(false);
       // console.log(groupLatestDevicesStatusData)
     }).catch((err) => {
-      console.log(err);
-      notification.error({
-        message: 'Request failed!',
-        description: err.message,
-      });
+      requestFailed(err);
+    })
+  }
+
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_API_URL}/api/user/info`, {
+      withCredentials: true
+    }).then(response => {
+      getAllData();
+    }).catch(error => {
+      console.error('Request Fail:', error);
+      if (error.response && error.response.status === 401) {
+        notification.error({
+          message: 'Please login first!',
+          description: 'You have not logged in yet, please log in first!',
+        });
+        navigate('/');
+      } else {
+        notification.error({
+          message: 'Request failed!',
+          description: error.message,
+        });
+      }
     })
 
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    }
+
+    window.addEventListener('resize', handleResize);
 
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -541,7 +548,7 @@ export default function Dashboard() {
           </Col>
         </Row>}
       <FloatButton.Group>
-        <FloatButton 
+        <FloatButton
           tooltip="Document"
           onClick={() => setShowDocModal(true)}
         />
@@ -614,7 +621,7 @@ export default function Dashboard() {
             <div>{'}'}</div>
           </div>
         </div>
-          
+
       </Modal>
     </div>
   )

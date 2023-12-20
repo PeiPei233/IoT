@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,9 @@ public class DeviceController {
     @GetMapping("/list")
     public ResponseEntity<List<Device>> getDeviceList(HttpSession session) {
         Integer uid = (Integer) session.getAttribute("uid");
+        if (uid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 401 (Unauthorized)
+        }
         ServiceResult result = deviceService.getDeviceList(uid);
         if (result.isSuccess()) {
             Object data = result.getData();
@@ -43,6 +47,9 @@ public class DeviceController {
     @PostMapping("/add")
     public ResponseEntity<String> addDevice(@RequestBody Device device, HttpSession session) {
         Integer uid = (Integer) session.getAttribute("uid");
+        if (uid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 401 (Unauthorized)
+        }
         device.setUid(uid);
         ServiceResult result = deviceService.addDevice(device);
         if (result.isSuccess()) {
@@ -55,6 +62,9 @@ public class DeviceController {
     @PostMapping("/delete")
     public ResponseEntity<String> deleteDevice(@RequestBody Device device, HttpSession session) {
         Integer uid = (Integer) session.getAttribute("uid");
+        if (uid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 401 (Unauthorized)
+        }
         device.setUid(uid);
         ServiceResult result = deviceService.deleteDevice(device);
         if (result.isSuccess()) {
@@ -67,6 +77,9 @@ public class DeviceController {
     @PostMapping("/update")
     public ResponseEntity<String> updateDevice(@RequestBody Device device, HttpSession session) {
         Integer uid = (Integer) session.getAttribute("uid");
+        if (uid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 401 (Unauthorized)
+        }
         device.setUid(uid);
         ServiceResult result = deviceService.updateDevice(device);
         if (result.isSuccess()) {
@@ -88,6 +101,9 @@ public class DeviceController {
     @GetMapping("/briefInfo")
     public ResponseEntity<BriefDeviceInfo> getBriefDeviceInfo(HttpSession session) {
         Integer uid = (Integer) session.getAttribute("uid");
+        if (uid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 401 (Unauthorized)
+        }
         ServiceResult activeResult = deviceService.getActiveDeviceCount(uid);
         ServiceResult totalResult = deviceService.getDeviceCount(uid);
         if (activeResult.isSuccess() && totalResult.isSuccess()) {

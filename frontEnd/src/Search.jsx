@@ -3,6 +3,7 @@ import { Card, Select, Form, Table, DatePicker, Row, Col, Button, App } from "an
 import { SearchOutlined } from '@ant-design/icons';
 import Map from "./Map";
 import axios from "axios";
+import { reGeoCode } from "./utils";
 
 const { RangePicker } = DatePicker;
 
@@ -15,13 +16,6 @@ const dateFormatter = Intl.DateTimeFormat('zh', {
   second: '2-digit',
   hour12: false,
 }).format;
-
-async function reGeoCode(lng, lat) {
-  const url = 'https://restapi.amap.com/v3/geocode/regeo?output=json&location='
-    + lng + ',' + lat + '&key=' + import.meta.env.VITE_AMAP_KEY + '&radius=1000&extensions=all';
-  const response = await axios.get(url);
-  return response.data.regeocode.formatted_address;
-}
 
 async function requestOptionDevices() {
   const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/device/list`, {
@@ -42,7 +36,7 @@ const columns = [
   },
   {
     title: 'Device Name',
-    dataIndex: 'deviceName',
+    dataIndex: 'device',
   },
   {
     title: 'Message Type',
@@ -79,11 +73,10 @@ export default function Searching() {
   const [loadingOptions, setLoadingOptions] = useState(false)
 
   const { message, modal, notification } = App.useApp()
-  
+
   useEffect(() => {
     setLoadingOptions(true)
     requestOptionDevices().then((res) => {
-      setLoadingOptions(false)
       setOptions(res)
       if (res.length === 0) {
         notification.info({
@@ -92,11 +85,20 @@ export default function Searching() {
         });
       }
     }).catch((err) => {
+      if (err.response && err.response.status === 401) {
+        notification.error({
+          message: 'Please login first!',
+          description: 'You have not logged in yet, please log in first!',
+        });
+        navigate('/');
+      } else {
+        notification.error({
+          message: 'Failed to get devices',
+          description: err.message,
+        });
+      }
+    }).finally(() => {
       setLoadingOptions(false)
-      notification.error({
-        message: 'Failed to get devices',
-        description: err.message,
-      });
     })
   }, [])
 
@@ -141,7 +143,7 @@ export default function Searching() {
           const res = response.data.map((data) => (
             reGeoCode(data.lng, data.lat).then((res) => ({
               deviceID: String(values.did).padStart(8, '0'),
-              deviceName: data.deviceName,
+              device: data.deviceName,
               type: data.type === 0 ? 'Normal' : data.type === 1 ? 'Warning' : 'Error',
               status: data.status === 0 ? 'Normal' : data.status === 1 ? 'Warning' : 'Error',
               time: dateFormatter(new Date(data.timestamp)),
@@ -153,7 +155,7 @@ export default function Searching() {
               key: data.mid
             })).catch((err) => ({
               deviceID: String(values.did).padStart(8, '0'),
-              deviceName: data.deviceName,
+              device: data.deviceName,
               type: data.type === 0 ? 'Normal' : data.type === 1 ? 'Warning' : 'Error',
               status: data.status === 0 ? 'Normal' : data.status === 1 ? 'Warning' : 'Error',
               time: dateFormatter(new Date(data.timestamp)),
@@ -178,10 +180,18 @@ export default function Searching() {
       })
       .catch(error => {
         console.error('Request Fail:', error);
-        notification.error({
-          message: 'Search failed!',
-          description: error.message,
-        });
+        if (error.response && error.response.status === 401) {
+          notification.error({
+            message: 'Please login first!',
+            description: 'You have not logged in yet, please log in first!',
+          });
+          navigate('/');
+        } else {
+          notification.error({
+            message: 'Search failed!',
+            description: error.message,
+          });
+        }
       }).finally(() => {
         setSearching(false)
       })
@@ -253,6 +263,15 @@ export default function Searching() {
           path={
             searchResults.map((item) => {
               return [item.lng, item.lat]
+            })
+          }
+          markers={
+            searchResults.map((item) => {
+              return {
+                position: [item.lng, item.lat],
+                title: item.device,
+                data: item
+              }
             })
           }
         />}

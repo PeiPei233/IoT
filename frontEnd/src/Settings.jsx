@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, Form, Button, Input, Row, Col, App, Typography, Modal, Alert, Avatar, Skeleton } from 'antd';
+import { Menu, Form, Button, Input, Row, Col, App, Typography, Modal, Alert, Avatar, Skeleton, notification } from 'antd';
 import { SettingOutlined, LockOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
@@ -50,10 +50,18 @@ function Account({ refreshUserInfo }) {
       })
       .catch(error => {
         console.error('Request Fail:', error);
-        notification.error({
-          message: 'Change email failed!',
-          description: error.message
-        })
+        if (error.response && error.response.status === 401) {
+          notification.error({
+            message: 'Please login first!',
+            description: 'You have not logged in yet, please log in first!',
+          });
+          navigate('/');
+        } else {
+          notification.error({
+            message: 'Change email failed!',
+            description: error.message
+          })
+        }
       })
   }
 
@@ -76,10 +84,18 @@ function Account({ refreshUserInfo }) {
       })
       .catch(error => {
         console.error('Request Fail:', error);
-        notification.error({
-          message: 'Change username failed!',
-          description: error.message
-        })
+        if (error.response && error.response.status === 401) {
+          notification.error({
+            message: 'Please login first!',
+            description: 'You have not logged in yet, please log in first!',
+          });
+          navigate('/');
+        } else {
+          notification.error({
+            message: 'Change username failed!',
+            description: error.message
+          })
+        }
       })
   }
 
@@ -103,10 +119,18 @@ function Account({ refreshUserInfo }) {
       })
       .catch(error => {
         console.error('Request Fail:', error);
-        notification.error({
-          message: 'Delete account failed!',
-          description: error.message
-        })
+        if (error.response && error.response.status === 401) {
+          notification.error({
+            message: 'Please login first!',
+            description: 'You have not logged in yet, please log in first!',
+          });
+          navigate('/');
+        } else {
+          notification.error({
+            message: 'Delete account failed!',
+            description: error.message
+          })
+        }
       })
   }
 
@@ -343,10 +367,18 @@ function Password() {
       })
       .catch(error => {
         console.error('Request Fail:', error);
-        notification.error({
-          message: 'Change password failed!',
-          description: error.message
-        })
+        if (error.response && error.response.status === 401) {
+          notification.error({
+            message: 'Please login first!',
+            description: 'You have not logged in yet, please log in first!',
+          });
+          navigate('/');
+        } else {
+          notification.error({
+            message: 'Change password failed!',
+            description: error.message
+          })
+        }
       })
       .finally(() => {
         setLoadingChange(false)
@@ -461,6 +493,18 @@ export default function Settings() {
       })
       .catch(error => {
         console.error('Request Fail:', error);
+        if (error.response && error.response.status === 401) {
+          notification.error({
+            message: 'Please login first!',
+            description: 'You have not logged in yet, please log in first!',
+          });
+          navigate('/');
+        } else {
+          notification.error({
+            message: 'Failed to get user info!',
+            description: error.message
+          })
+        }
       })
       .finally(() => {
         setLoadingInfo(false)
@@ -506,7 +550,7 @@ export default function Settings() {
           />
         </Col>
         <Col xs={24} md={18}>
-          {current === 'account' ? <Account refreshUserInfo={refreshUserInfo}/> : <Password />}
+          {current === 'account' ? <Account refreshUserInfo={refreshUserInfo} /> : <Password />}
         </Col>
       </Row>
     </div>

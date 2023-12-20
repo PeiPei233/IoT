@@ -287,9 +287,7 @@ function Home() {
       withCredentials: true
     })
       .then(response => {
-        if (response.status === 200) {
-          return navigate('/dashboard');
-        }
+        return navigate('/dashboard');
       })
   }
 
