@@ -477,6 +477,8 @@ function Password() {
 
 export default function Settings() {
 
+  const navigate = useNavigate()
+
   const [current, setCurrent] = useState('account');
   const [username, setUsername] = useState('unknown');
   const [email, setEmail] = useState('unknown@unkown.com');

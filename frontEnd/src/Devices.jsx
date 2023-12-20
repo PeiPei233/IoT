@@ -1,7 +1,7 @@
 import { Flex, Card, Spin, Empty, Button, FloatButton, Form, Input, Modal, App, List, Avatar, Row, Col, Typography } from 'antd'
 import { useState, useEffect, useRef } from 'react'
 import { PlusOutlined, ExclamationCircleOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 const { confirm } = Modal
@@ -9,6 +9,8 @@ const { Search } = Input
 const { Text, Title } = Typography
 
 export default function Devices() {
+
+  const navigate = useNavigate()
 
   const [loading, setLoading] = useState(true)
   const [devices, setDevices] = useState([])

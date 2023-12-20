@@ -4,6 +4,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import Map from "./Map";
 import axios from "axios";
 import { reGeoCode } from "./utils";
+import { useNavigate } from "react-router-dom";
 
 const { RangePicker } = DatePicker;
 
@@ -65,6 +66,8 @@ const columns = [
 ];
 
 export default function Searching() {
+
+  const navigate = useNavigate()
 
   const [form] = Form.useForm()
   const [options, setOptions] = useState([])
