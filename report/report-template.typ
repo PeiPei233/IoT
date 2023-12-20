@@ -293,7 +293,7 @@
 
   show heading: it => {
     text(font: hei)[#it]
-    v(5pt)
+    v(0.5em)
     fake-par
   }
   
