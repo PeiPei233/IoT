@@ -64,7 +64,9 @@
 
 == 尝试在线演示版本
 
-访问 #link("http://124.222.30.40:3030")[`http://124.222.30.40:3030`] 即可使用在线演示版本。该版本使用@Docker-Image 中的 Docker 镜像部署，但未配置模拟器。您可以按照@Docker-Image 或 @Source-Code 中的步骤向 `tcp://124.222.30.40:3036` 的 `testapp` topic 发送消息，以模拟设备上报数据，上报的数据格式如@Device-Message-Format 所示。除此之外，演示版本也提供了便捷的模拟消息发送接口。您可以访问  `http://124.222.30.40:3033/<device_id>` 来模拟设备 ID 为 `<device_id>` 的设备上报数据。每次访问该接口，都会随机生成一条数据，上报的数据格式如@Device-Message-Format 所示。
+访问 #link("http://124.222.30.40:3030")[`http://124.222.30.40:3030`] 即可使用在线演示版本。该版本使用@Docker-Image 中的 Docker 镜像部署，但未配置模拟器。如有设备需要上报消息，您可以按照@Docker-Image 或 @Source-Code 中的步骤向 `tcp://124.222.30.40:3036` 的 `testapp` topic 发送消息，上报数据的格式如@Device-Message-Format 所示。
+
+除此之外，演示版本也提供了便捷的模拟消息发送接口。如有需要，您可以访问  `http://124.222.30.40:3033/<device_id>` 来模拟设备 ID 为 `<device_id>` 的设备上报数据。每次访问该接口，都会随机生成一条数据，上报的数据格式如@Device-Message-Format 所示。
 
 == 使用 Docker 镜像 <Docker-Image>
 
@@ -388,7 +390,7 @@
   image("assets/manual/settings-delete.png", width: 50%)
 )
 
-在该对话框中，用户输入密码，点击 #inline-button(bg-color: rgb(255,77,79))[I\'m sure, delete my account!] 按钮即可删除账户。删除成功后会跳转到登录界面。
+在该对话框中，用户输入密码，点击 #inline-button(bg-color: rgb(255,77,79), text(weight: "bold", "I'm sure, delete my account!")) 按钮即可删除账户。删除成功后会跳转到登录界面。
 
 ==== 修改密码
 
@@ -403,3 +405,7 @@
 #figure(
   image("assets/manual/settings-password-success.png", width: 60%)
 )
+
+== 会话过期
+
+当用户登录后，若长时间未进行操作，会话会过期，此时进行任意操作或刷新页面都将会跳转回登录界面。
