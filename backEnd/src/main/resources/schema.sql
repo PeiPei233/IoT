@@ -46,11 +46,11 @@ create table if not exists device
 (
     did      int auto_increment
         primary key,
-    name     varchar(255)  not null,
-    type     varchar(255)  null,
-    location varchar(255)  null,
-    status   int default 0 not null,
-    uid      int           not null,
+    name     varchar(255) collate utf8mb4_unicode_ci not null,
+    type     varchar(255) collate utf8mb4_unicode_ci null,
+    location varchar(255) collate utf8mb4_unicode_ci null,
+    status   int default 0                           not null,
+    uid      int                                     not null,
     constraint device_user_uid_fk
         foreign key (uid) references user (uid)
             on update cascade on delete cascade
@@ -60,16 +60,17 @@ create table if not exists message
 (
     mid       int auto_increment
         primary key,
-    type      int default 0 null,
-    status    int default 0 not null,
-    value     int           null,
-    info      varchar(255)  null,
-    lng       double        null,
-    lat       double        null,
-    timestamp mediumtext    not null,
-    did       int           not null,
+    type      int default 0                           null,
+    status    int default 0                           not null,
+    value     int                                     null,
+    info      varchar(255) collate utf8mb4_unicode_ci null,
+    lng       double                                  null,
+    lat       double                                  null,
+    timestamp mediumtext                              not null,
+    did       int                                     not null,
     constraint message_device_did_fk
         foreign key (did) references device (did)
             on update cascade on delete cascade
 );
+
 
