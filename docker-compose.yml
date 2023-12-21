@@ -14,6 +14,8 @@ services:
 
   db:
     image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
     ports:
       - "3306:3306"
     volumes:
@@ -26,6 +28,15 @@ services:
       - "1883:1883"
     volumes:
       - ./backEnd/src/main/resources/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  client:
+    image: iotclient:1.0.0
+    environment:
+      - SERVER=tcp://mqtt:1883
+    restart: always
+    depends_on:
+      - db
+      - mqtt
 
 volumes:
   db-data:
