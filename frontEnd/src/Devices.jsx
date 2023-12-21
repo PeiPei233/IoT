@@ -229,7 +229,7 @@ export default function Devices() {
                   } />
                 <div>
                   <Title level={4} style={{ marginBottom: 0 }}>{device.name}</Title>
-                  <Text>{`${device.type} - ${device.location}`}</Text>
+                  <Text>{device.type + (device.location ? ` - ${device.location}` : "")}</Text>
                 </div>
               </Card>
             ))}
@@ -328,7 +328,10 @@ export default function Devices() {
         <p><b>Device Location:</b> {result.location}</p>
         <p>
           Use the Device ID to connect your device to the server.
-          See the <Link onClick={() => setShowDocModal(true)}>documentation</Link> for more information.
+          See the <a onClick={() => {
+            setShowAddResult(false)
+            setShowDocModal(true)
+          }}>documentation</a> for more information.
         </p>
       </Modal>
       <Modal

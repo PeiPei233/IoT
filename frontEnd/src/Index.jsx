@@ -55,9 +55,14 @@ function Register({ setState, setLoading }) {
 
   const validateUsername = async (value) => {
     const usernamePattern = /^[a-zA-Z0-9_-]{4,16}$/;
+    const validChars = /^[a-zA-Z0-9_-]*$/;
     if (!usernamePattern.test(value)) {
       if (value.length !== 0) {
-        throw new Error('Username must be 4-16 characters long!');
+        if (!validChars.test(value)) {
+          throw new Error('Username can only contain letters, numbers, underscores and hyphens!');
+        } else {
+          throw new Error('Username must be 4-16 characters long!');
+        }
       }
     } else {
       await axios.get(`${import.meta.env.VITE_API_URL}/api/user/validateUsername?username=` + value, {
