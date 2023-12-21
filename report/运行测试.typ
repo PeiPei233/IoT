@@ -141,6 +141,14 @@
   image("assets/test/short-pwd.png", width: 25%)
 )
 
+==== 非法用户名
+
+测试用例：非法用户名。输入用户名 用户，可以看到系统弹出错误提示，提示用户名不合法。
+
+#figure(
+  image("assets/test/invalid-username.png", width: 25%)
+)
+
 ==== 空表单
 
 测试用例：空表单。点击注册按钮，可以看到系统弹出错误提示，提示用户名、密码、确认密码、邮箱不能为空。

@@ -62,27 +62,26 @@
 
 = 安装运行指南
 
-== 使用 Docker 安装
+== 尝试在线演示版本
 
-在项目根目录（即包含 `docker-compose.yml` 文件的目录）执行以下命令即可启动项目：
+访问 #link("http://124.222.30.40:3030")[`http://124.222.30.40:3030`] 即可使用在线演示版本。该版本使用下述的 Docker 镜像部署，但未配置模拟器。您可以按照下面的步骤向 `tcp://124.222.30.40:3036` 的 `testapp` topic 发送消息，以模拟设备上报数据。另外，演示版本也提供了便捷的模拟消息发送接口，您可以访问 `http://124.222.30.40:3033/<device_id>` 来模拟设备 ID 为 `<device_id>` 的设备上报数据。
 
-```bash
-    docker load -i backend.tar
-    docker-compose up
-```
+== 使用 Docker
 
-上述方式启动的并未包括模拟终端。如需一同启动模拟终端，请执行以下命令：
+使用本项目时，需要用到 Docker 的 #link("https://docs.docker.com/compose/install/")[Docker Compose] 工具。安装完成后，在项目根目录（即包含 `docker-compose.yml` 文件的目录）执行以下命令即可启动项目：
 
 ```bash
     docker load -i backend.tar
     docker load -i iotclient.tar
-    docker-compose -f docker-compose-with-client.yml up
+    docker compose up
 ```
 
-使用此方式启动的模拟器会模拟 ID 为 00001 至 00005 的设备发消息，发消息的间隔时间最大10秒。如需修改模拟器的配置，请修改 `docker-compose-with-client.yml` 文件中 `client` 的环境变量。也可以只启动未包括模拟器的后端服务，然后在本地使用以下命令启动模拟器：
+使用此方式启动时会一起启动一个终端模拟器，模拟器会模拟 ID 为 00001 至 00005 的设备发消息，发消息的间隔时间最大10秒。如需修改模拟器的配置，请修改 `docker-compose.yml` 文件中 `client` 的环境变量。也可以只启动未包括模拟器的后端服务，然后在本地使用以下命令启动模拟器：
 
 ```bash
-    docker load -i iotclient.tar
+    # 在后台启动未包含模拟器的后端服务
+    docker compose up app -d
+    # 启动模拟器
     docker run --net=host iotclient:1.0.0 -e \
       DEVICES=${YOUR_DEVICES} \
       SERVER=tcp://localhost:1883 \
@@ -98,10 +97,16 @@
 / `SERVER`: 模拟器连接的服务器地址，默认为 `tcp://localhost:1883`。
 / `TOPIC`: 模拟器发送消息的主题，默认为 `testapp`。
 / `PREFIX`: 模拟器发送消息时给设备 ID 添加的前缀，默认为空。
-/ `INTERVAL_BOUND`: 模拟器发送消息的间隔时间的上界，默认为 10 秒。若将该值设置为一个正整数，则模拟器每次发消息前会随机生成一个 0 至该值之间的浮点数，作为发送消息的间隔时间。
+/ `INTERVAL_BOUND`: 模拟器发送消息的间隔时间的上界，默认为 10 秒。若将该值设置为一个正整数，则模拟器每次发消息前会随机生成一个 0 至该值之间的整数，作为发送消息的间隔时间。
 / `CLIENT_ID`: 模拟器一定会模拟的设备 ID，默认为 -1，表示不特定模拟某个设备。若将该值设置为一个正整数，则模拟器除了按照 `DEVICES` 的规则模拟设备外，还会模拟该 ID 的设备发消息。
 
-== 使用源码安装
+启动后，可以通过浏览器访问 `http://localhost:8080` 来使用本项目。如需停止项目，请在项目根目录执行以下命令：
+
+```bash
+    docker compose down
+```
+
+== 使用源码
 
 1. 需要安装以下软件：
 
