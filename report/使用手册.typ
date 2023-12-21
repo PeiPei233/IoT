@@ -64,9 +64,9 @@
 
 == 尝试在线演示版本
 
-访问 #link("http://124.222.30.40:3030")[`http://124.222.30.40:3030`] 即可使用在线演示版本。该版本使用下述的 Docker 镜像部署，但未配置模拟器。您可以按照下面的步骤向 `tcp://124.222.30.40:3036` 的 `testapp` topic 发送消息，以模拟设备上报数据。另外，演示版本也提供了便捷的模拟消息发送接口，您可以访问 `http://124.222.30.40:3033/<device_id>` 来模拟设备 ID 为 `<device_id>` 的设备上报数据。
+访问 #link("http://124.222.30.40:3030")[`http://124.222.30.40:3030`] 即可使用在线演示版本。该版本使用@Docker-Image 中的 Docker 镜像部署，但未配置模拟器。您可以按照@Docker-Image 或 @Source-Code 中的步骤向 `tcp://124.222.30.40:3036` 的 `testapp` topic 发送消息，以模拟设备上报数据，上报的数据格式如@Device-Message-Format 所示。除此之外，演示版本也提供了便捷的模拟消息发送接口。您可以访问  `http://124.222.30.40:3033/<device_id>` 来模拟设备 ID 为 `<device_id>` 的设备上报数据。每次访问该接口，都会随机生成一条数据，上报的数据格式如@Device-Message-Format 所示。
 
-== 使用 Docker
+== 使用 Docker 镜像 <Docker-Image>
 
 使用本项目时，需要用到 Docker 的 #link("https://docs.docker.com/compose/install/")[Docker Compose] 工具。安装完成后，在项目根目录（即包含 `docker-compose.yml` 文件的目录）执行以下命令即可启动项目：
 
@@ -106,7 +106,7 @@
     docker compose down
 ```
 
-== 使用源码
+== 使用源码 <Source-Code>
 
 1. 需要安装以下软件：
 
@@ -156,6 +156,40 @@
 / `prefix`: 模拟器发送消息时给设备 ID 添加的前缀，默认为空。
 / `interval_bound`: 模拟器发送消息的间隔时间的上界，默认为 10 秒。若将该值设置为一个正整数，则模拟器每次发消息前会随机生成一个 0 至该值之间的浮点数，作为发送消息的间隔时间。
 / `client_id`: 模拟器一定会模拟的设备 ID，默认为 -1，表示不特定模拟某个设备。若将该值设置为一个正整数，则模拟器除了按照 `devices` 的规则模拟设备外，还会模拟该 ID 的设备发消息。
+
+== 设备消息格式 <Device-Message-Format>
+
+本项目使用 MQTT 协议接收设备上报的消息，设备上报的消息以 JSON 格式发送，消息格式如下：
+
+```json
+    {
+        // Device ID when adding a device
+        "clientId": "00001",
+        // Device info/message
+        "info": "This is a message",
+        // >=0: message value with device status normal
+        // -1: device status warning, -2: device status error
+        "value": 4,
+        // Message type: 0: normal, 1: warning, 2: error
+        "alert": 0,
+        // longitude
+        "lng": 116.397428,
+        // latitude
+        "lat": 39.90923,
+        // timestamp in milliseconds
+        "timestamp": 16276164700000
+    }
+```
+
+其中：
+
+/ `clientId`: 设备 ID，当添加设备时会自动生成，由数字组成。
+/ `info`: 设备上报的消息。
+/ `value`: 设备上报的消息的值，若为正整数，则表示设备状态正常，若为 -1，则表示设备状态警告，若为 -2，则表示设备状态错误。
+/ `alert`: 设备上报的消息的类型，若为 0，则表示消息类型为正常，若为 1，则表示消息类型为警告，若为 2，则表示消息类型为错误。
+/ `lng`: 设备上报的消息的经度。
+/ `lat`: 设备上报的消息的纬度。
+/ `timestamp`: 设备上报的消息的 UNIX 时间戳，单位为毫秒。
 
 = 功能介绍
 
