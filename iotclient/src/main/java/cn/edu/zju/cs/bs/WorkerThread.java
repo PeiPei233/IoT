@@ -18,6 +18,7 @@ public class WorkerThread extends Thread {
     private String mqttServer;
     private String topic;
     private String clientPrefix;
+    private int intervalBound = 10;
 
     public void run() {
         try {
@@ -37,8 +38,8 @@ public class WorkerThread extends Thread {
             System.out.println("Connected");
             while (running) {
                 //随机等待10秒
-                int interval = rand.nextInt(10);
-                Thread.sleep(interval * 1000);
+                int interval = rand.nextInt(intervalBound);
+                Thread.sleep(interval * 1000L);
 
                 SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 Date now = new Date();
