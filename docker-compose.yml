@@ -1,7 +1,7 @@
 version: '3'
 services:
   app:
-    image: backend:0.0.1-SNAPSHOT
+    build: ./backEnd
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/iot?useSSL=false
       - MQTT_BROKER_URL=tcp://mqtt:1883
@@ -30,12 +30,22 @@ services:
       - ./backEnd/src/main/resources/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
   client:
-    image: iotclient:1.0.0
+    build: ./iotclient
     environment:
       - SERVER=tcp://mqtt:1883
     restart: always
     depends_on:
-      - db
+      - mqtt
+
+  sim:
+    build: ./iotsimulator
+    ports:
+      - "5000:5000"
+    environment:
+      - MQTT_BROKER=mqtt
+      - MQTT_PORT=1883
+    restart: always
+    depends_on:
       - mqtt
 
 volumes:
