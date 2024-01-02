@@ -74,7 +74,7 @@ public class MqttSubscriber {
                     }
                     System.out.println(message);
                     messageMapper.insertMessage(message);
-                    deviceMapper.updateDeviceStatusByDid(message.getDid(), message.getType());
+                    deviceMapper.updateDeviceStatusByDid(message.getDid(), message.getStatus());
                     System.out.println("Message inserted - Device ID: " + iotMessage.getClientId());
                 } catch (Exception e) {
                     System.out.println("Insert message failed - Device not found with ID: " + iotMessage.getClientId());
